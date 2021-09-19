@@ -1,0 +1,7 @@
+//this is an example config json, delete this line when using this file
+{
+  "account": "account_name",
+  "private_key": "priv_key",
+  "drivers": ["1099545245436", "1099545306108"],
+  "vehicles": ["1099545234073"]
+}

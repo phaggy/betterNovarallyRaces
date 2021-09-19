@@ -1,0 +1,21 @@
+{
+  "name": "betternovarally",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd build && npx tsc && npx pkg index.js -o binaries/betternovarally  --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "eosjs": "^22.1.0",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.12",
+    "pkg": "^5.3.2",
+    "typescript": "^4.4.3"
+  }
+}
