@@ -2,6 +2,6 @@
 {
   "account": "account_name",
   "private_key": "priv_key",
-  "drivers": ["ex_assetid", "1099545306108"],
+  "drivers": ["ex_assetid", "ex_assetid"],
   "vehicles": ["1099545234073"]
 }
