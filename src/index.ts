@@ -42,12 +42,12 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   if (!race_progress) {
     console.log("trying to race");
     try {
-      // await do_race(
-      //   account,
-      //   vehicle_asset_id,
-      //   driver1_asset_id,
-      //   driver2_asset_id
-      // );
+      await do_race(
+        account,
+        vehicle_asset_id,
+        driver1_asset_id,
+        driver2_asset_id
+      );
     } catch (err) {
       console.error("error trying do trx");
       process.exit();
