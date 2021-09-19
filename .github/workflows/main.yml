@@ -1,0 +1,39 @@
+name: NodeJS with pkg and tsc
+
+on:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build
+        run: |
+          npm install
+          npx tsc
+          cd build
+          npx pkg index.js -o binaries/race --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip
+        
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.RELEASE_TOKEN }}"
+          prerelease: false
+          files:
+            build/binaries/*
