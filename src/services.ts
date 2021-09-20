@@ -31,6 +31,19 @@ const is_race_in_progress = async (account: string): Promise<boolean> => {
   }
 };
 
+const get_snake_oil_balance = async (account: string): Promise<string> => {
+  const data = { code: "novarallytok", account: "buttnuster24", symbol: null };
+  try {
+    const result = await axios.post(
+      `${ENDPOINT}/v1/chain/get_currency_balance`,
+      data
+    );
+    return result.data[0];
+  } catch (err) {
+    return get_snake_oil_balance(account);
+  }
+};
+
 const get_race_results = async (account: string) => {
   const data = {
     json: true,
@@ -126,4 +139,10 @@ const do_race = async (
   await doTrx(actions);
 };
 
-export { do_race, is_race_in_progress, get_race_results, get_player_info };
+export {
+  do_race,
+  is_race_in_progress,
+  get_race_results,
+  get_player_info,
+  get_snake_oil_balance,
+};

@@ -3,6 +3,7 @@ import {
   is_race_in_progress,
   get_race_results,
   get_player_info,
+  get_snake_oil_balance,
 } from "./services";
 import {
   account,
@@ -14,14 +15,18 @@ import {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 (async () => {
-  let player_info = await get_player_info(account);
-  let race_progress = await is_race_in_progress(account);
+  let [player_info, race_progress, snake_oil_balance] = await Promise.all([
+    get_player_info(account),
+    is_race_in_progress(account),
+    get_snake_oil_balance(account),
+  ]);
 
   let daily_race_count = player_info.daily_race_count;
   let realtime_race_count = race_progress
     ? daily_race_count - 1
     : daily_race_count;
 
+  console.log("Snake Oil: ", snake_oil_balance);
   console.log("daily race count: ", realtime_race_count);
 
   if (race_progress) console.log("one race in progress");
