@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc && cd build &&  npx pkg index.js -o binaries/betternovarally  --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip"
+    "build": "npx tsc && cd build && npx pkg index.js -o binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip",
+    "start": "npx tsc && cd build && node index.js"
   },
   "author": "",
   "license": "ISC",
