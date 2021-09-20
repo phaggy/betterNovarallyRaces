@@ -41,7 +41,7 @@ const get_race_results = async (account: string) => {
     upper_bound: "",
     index_position: 1,
     key_type: "",
-    limit: 25,
+    limit: 1000,
     reverse: true,
     show_payer: false,
   };
@@ -56,9 +56,7 @@ const get_race_results = async (account: string) => {
   }
 };
 
-const get_player_info = async (
-  account: string
-): Promise<Array<player_info>> => {
+const get_player_info = async (account: string): Promise<player_info> => {
   const data = {
     json: true,
     code: "novarallyapp",
@@ -77,9 +75,9 @@ const get_player_info = async (
       `${ENDPOINT}/v1/chain/get_table_rows`,
       data
     );
-    return result.data.rows;
-  } catch (err) {
-    console.log(err);
+    return result.data.rows[0];
+  } catch (err: any) {
+    console.log(err.message);
     console.log("trying to fetch player info again");
     return get_player_info(account);
   }
