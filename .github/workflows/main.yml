@@ -7,6 +7,7 @@ on:
   pull_request:
     tags:
       - "v*"
+      - "!*-rc*"
 
 jobs:
   build:
@@ -35,5 +36,6 @@ jobs:
         with:
           repo_token: "${{ secrets.RELEASE_TOKEN }}"
           prerelease: false
-          files:
+          files: |
             build/binaries/*
+            src/config.json

@@ -2,6 +2,7 @@ import axios from "axios";
 import { ENDPOINT } from "./config";
 
 import { doTrx } from "./doTrx";
+import { player_info } from "./types";
 
 const is_race_in_progress = async (account: string): Promise<boolean> => {
   const data = {
@@ -55,7 +56,9 @@ const get_race_results = async (account: string) => {
   }
 };
 
-const get_player_info = async (account: string) => {
+const get_player_info = async (
+  account: string
+): Promise<Array<player_info>> => {
   const data = {
     json: true,
     code: "novarallyapp",
@@ -77,6 +80,8 @@ const get_player_info = async (account: string) => {
     return result.data.rows;
   } catch (err) {
     console.log(err);
+    console.log("trying to fetch player info again");
+    return get_player_info(account);
   }
 };
 
