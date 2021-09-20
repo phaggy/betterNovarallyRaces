@@ -6,9 +6,8 @@ on:
       - "v*"
   pull_request:
     tags:
+      - "!v*-rc*"
       - "v*"
-    tags-ignore:
-      - "v*-rc*"
 
 jobs:
   build:
