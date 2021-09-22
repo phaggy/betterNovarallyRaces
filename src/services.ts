@@ -4,6 +4,8 @@ import { ENDPOINT } from "./config";
 import { doTrx } from "./doTrx";
 import { player_info } from "./types";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const is_race_in_progress = async (account: string): Promise<boolean> => {
   const data = {
     json: true,
@@ -141,6 +143,7 @@ const do_race = async (
 
 export {
   do_race,
+  sleep,
   is_race_in_progress,
   get_race_results,
   get_player_info,

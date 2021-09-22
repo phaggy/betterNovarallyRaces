@@ -18,7 +18,7 @@ export const api = new Api({
 export const doTrx = async (newActions: Array<any>) => {
   try {
     // console.dir({ newActions }, { depth: null });
-    const transaction = await api.transact(
+    await api.transact(
       {
         actions: newActions,
       },
@@ -27,9 +27,6 @@ export const doTrx = async (newActions: Array<any>) => {
         expireSeconds: 30,
       }
     );
-    // @ts-ignore
-    const tr_id = transaction.transaction_id;
-    console.log(tr_id);
   } catch (err: any) {
     console.log("sus", err.message, "\n---");
     throw err;
