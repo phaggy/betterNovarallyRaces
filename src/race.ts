@@ -13,10 +13,10 @@ import {
   vehicle_asset_id,
 } from "./config";
 
-const race = async (
-  race_progress: boolean,
-  previous_results: Array<any>
-): Promise<number> => {
+import ora from "ora";
+
+const race = async (previous_results: Array<any>): Promise<number> => {
+  let race_progress = await is_race_in_progress(account);
   let player_info = await get_player_info(account);
   let daily_race_count = player_info.daily_race_count;
 
@@ -38,20 +38,16 @@ const race = async (
   await sleep(2000);
 
   race_progress = await is_race_in_progress(account);
+  const spinner = ora("Race in Progress").start();
 
-  console.log("");
+  // console.log("");
   while (race_progress) {
-    process.stdout.write(" Race is in progress, pls wait" + "\r");
-    await sleep(2000);
-    process.stdout.write(" Race is in progress, pls wait." + "\r");
-    await sleep(2000);
-    process.stdout.write(" Race is in progress, pls wait.." + "\r");
-    await sleep(2000);
-    process.stdout.write(" Race is in progress, pls wait..." + "\r");
+    // spinner.color = "white";
+    await sleep(2500);
+    // spinner.color = "yellow";
     race_progress = await is_race_in_progress(account);
-    process.stdout.write("                                 " + "\r");
   }
-
+  spinner.stop();
   await sleep(1000);
 
   // player_info updated here

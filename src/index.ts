@@ -7,10 +7,15 @@ import {
 import { account } from "./config";
 import race from "./race";
 
+import { autoraceaction } from "./state";
+
 (async () => {
   const console_args = process.argv;
-  const auto_race = console_args.find((arg) => arg === "--autorace");
-  if (auto_race) console.log("---auto race---");
+  autoraceaction(
+    "update",
+    console_args.find((arg) => arg === "--autorace")
+  );
+  if (autoraceaction("get")) console.log("---auto race---");
   else console.log("---no-autorace---");
 
   let [player_info, race_progress, snake_oil_balance] = await Promise.all([
@@ -45,8 +50,8 @@ import race from "./race";
   );
 
   do {
-    daily_race_count = await race(race_progress, previous_results);
-  } while (daily_race_count < 10 && auto_race);
+    daily_race_count = await race(previous_results);
+  } while (daily_race_count < 10 && autoraceaction("get"));
   {
   }
 

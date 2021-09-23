@@ -12,7 +12,8 @@
   "dependencies": {
     "axios": "^0.21.4",
     "eosjs": "^22.1.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "ora": "^5.4.1"
   },
   "devDependencies": {
     "@types/node": "^16.9.4",
