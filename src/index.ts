@@ -49,10 +49,10 @@ import { autoraceaction } from "./state";
     }, "\n\n")
   );
 
-  do {
-    daily_race_count = await race(previous_results);
-  } while (daily_race_count < 10 && autoraceaction("get"));
-  {
+  if (daily_race_count < 10) {
+    do {
+      daily_race_count = await race(previous_results);
+    } while (daily_race_count < 10 && autoraceaction("get"));
   }
 
   if (daily_race_count === 10) {

@@ -20,6 +20,7 @@ const race = async (previous_results: Array<any>): Promise<number> => {
   let race_progress = await is_race_in_progress(account);
   let player_info = await get_player_info(account);
   let daily_race_count = player_info.daily_race_count;
+  let people_in_queue;
 
   if (!race_progress && daily_race_count < 10) {
     console.log("trying to race");
@@ -46,13 +47,15 @@ const race = async (previous_results: Array<any>): Promise<number> => {
     // spinner.color = "white";
     await sleep(2500);
     // spinner.color = "yellow";
-    race_progress = await is_race_in_progress(account);
-    const people_in_queue = await get_people_in_queue();
+    [race_progress, people_in_queue] = await Promise.all([
+      is_race_in_progress(account),
+      get_people_in_queue(),
+    ]);
     spinner.text = `people in queue ${String(people_in_queue)}`;
     // process.stdout.write(people_in_queue + "\r");
   }
   spinner.stop();
-  await sleep(1000);
+  await sleep(500);
 
   // player_info updated here
   player_info = await get_player_info(account);
@@ -63,7 +66,7 @@ const race = async (previous_results: Array<any>): Promise<number> => {
   const new_race_results = new_results[0];
 
   if (previous_results.length !== new_results.length) {
-    console.log("Race Result:", new_race_results.position);
+    console.log("\nRace Result:", new_race_results.position, "\n");
     console.log("daily race count:", daily_race_count);
     if (new_race_results.prize_template_id > 0)
       console.log("You won a prize, claim it");
