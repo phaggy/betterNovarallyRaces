@@ -4,6 +4,7 @@ import {
   get_player_info,
   get_race_results,
   sleep,
+  get_people_in_queue,
 } from "./services";
 
 import {
@@ -46,6 +47,9 @@ const race = async (previous_results: Array<any>): Promise<number> => {
     await sleep(2500);
     // spinner.color = "yellow";
     race_progress = await is_race_in_progress(account);
+    const people_in_queue = await get_people_in_queue();
+    spinner.text = `people in queue ${String(people_in_queue)}`;
+    // process.stdout.write(people_in_queue + "\r");
   }
   spinner.stop();
   await sleep(1000);

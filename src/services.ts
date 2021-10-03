@@ -33,6 +33,32 @@ const is_race_in_progress = async (account: string): Promise<boolean> => {
   }
 };
 
+const get_people_in_queue = async (): Promise<number> => {
+  const data = {
+    json: true,
+    code: "novarallyapp",
+    scope: "novarallyapp",
+    table: "queue",
+    lower_bound: "",
+    upper_bound: "",
+    index_position: 1,
+    key_type: "",
+    limit: 1000,
+    reverse: true,
+    show_payer: false,
+  };
+  try {
+    const result = await axios.post(
+      `${ENDPOINT}/v1/chain/get_table_rows`,
+      data
+    );
+    return result.data.rows.length;
+  } catch (err) {
+    console.error(err);
+    return 0;
+  }
+};
+
 const get_snake_oil_balance = async (account: string): Promise<string> => {
   const data = { code: "novarallytok", account: "buttnuster24", symbol: null };
   try {
@@ -148,4 +174,5 @@ export {
   get_race_results,
   get_player_info,
   get_snake_oil_balance,
+  get_people_in_queue,
 };
