@@ -3,6 +3,7 @@ name: NodeJS with pkg and tsc
 on:
   push:
     tags:
+      - "!v*-rc*"
       - "v*"
   pull_request:
     tags:
