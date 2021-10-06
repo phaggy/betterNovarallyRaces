@@ -1,24 +1,60 @@
 {
-  "name": "betternovarally",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "npx tsc && cd build && npx pkg index.js -o binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip",
-    "start": "npx tsc && cd build && node index.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "axios": "^0.21.4",
-    "eosjs": "^22.1.0",
-    "node-fetch": "^2.6.1",
-    "ora": "^5.4.1"
-  },
-  "devDependencies": {
-    "@types/node": "^16.9.4",
-    "@types/node-fetch": "^2.5.12",
-    "pkg": "^5.3.2",
-    "typescript": "^4.4.3"
-  }
+	"name": "betterNovarallyRaces",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": "dist/cli.js",
+	"engines": {
+		"node": ">=10"
+	},
+	"scripts": {
+		"build": "tsc",
+		"start": "npm run build && dist/cli.js",
+		"pretest": "npm run build",
+		"test": "xo && ava"
+	},
+	"files": [
+		"dist/cli.js"
+	],
+	"dependencies": {
+		"axios": "^0.22.0",
+		"blacklist": "^1.1.4",
+		"eosjs": "^22.1.0",
+		"ink": "^3.0.9",
+		"ink-image": "^2.0.0",
+		"meow": "^9.0.0",
+		"node-fetch": "^2.6.1",
+		"react": "^16.14.0",
+		"terminal-image": "^2.0.0"
+	},
+	"ava": {
+		"typescript": {
+			"extensions": [
+				"tsx"
+			],
+			"rewritePaths": {
+				"source/": "dist/"
+			}
+		}
+	},
+	"xo": {
+		"extends": "xo-react",
+		"rules": {
+			"react/prop-types": "off"
+		}
+	},
+	"devDependencies": {
+		"@ava/typescript": "^2.0.0",
+		"@sindresorhus/tsconfig": "^2.0.0",
+		"@types/blacklist": "^1.1.0",
+		"@types/node-fetch": "^2.5.12",
+		"@types/react": "^17.0.27",
+		"ava": "^3.15.0",
+		"chalk": "^4.1.2",
+		"eslint-config-xo-react": "^0.25.0",
+		"eslint-plugin-react": "^7.26.1",
+		"eslint-plugin-react-hooks": "^4.2.0",
+		"ink-testing-library": "^2.1.0",
+		"typescript": "^4.4.3",
+		"xo": "^0.39.1"
+	}
 }
