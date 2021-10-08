@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { Box, Text, Newline, useApp } from "ink";
 import Spinner from "ink-spinner";
 
-import { player_info } from "./types";
+import { player_info } from "../types";
 import {
 	get_people_in_queue,
 	get_player_info,
@@ -10,10 +10,10 @@ import {
 	is_race_in_progress,
 	get_race_results,
 	sleep,
-} from "./services";
+} from "../services";
 
-import { config } from "./cli";
-import do_race from "./doRace";
+import { config } from "../cli";
+import do_race from "../doRace";
 
 const Race: FC<{
 	autorace: boolean | undefined;
@@ -30,6 +30,7 @@ const Race: FC<{
 	SetDaily_race_count: React.Dispatch<number>;
 	Setsnake_oil_balance: React.Dispatch<React.SetStateAction<string>>;
 	config: config;
+	changeOurRaceCountFromChild: any;
 }> = ({
 	autorace,
 	previous_results,
@@ -41,8 +42,10 @@ const Race: FC<{
 	daily_race_count,
 	SetDaily_race_count,
 	Setrealtime_race_count,
+	race_results,
 	SetRace_results,
 	config,
+	changeOurRaceCountFromChild,
 }) => {
 	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
 		undefined
@@ -98,6 +101,7 @@ const Race: FC<{
 						SetOur_race_count(
 							(current_our_race_count) => current_our_race_count + result
 						);
+						changeOurRaceCountFromChild(our_race_count);
 						Setrace_progress(await is_race_in_progress(account));
 						SetPeople_in_queue(await get_people_in_queue());
 					}
@@ -108,22 +112,24 @@ const Race: FC<{
 
 	return (
 		<>
-			<Newline />
-			<Box marginLeft={2}>
+			<Box marginLeft={5} marginTop={1}>
+				<Text>Previos Race result: </Text>
+				<Text color="yellowBright">{race_results[0].position}</Text>
+			</Box>
+
+			<Box marginLeft={5} marginTop={1}>
 				<Text>No. of people in queue </Text>
 				<Text color="yellowBright">{people_in_queue}</Text>
 			</Box>
-			<Box marginLeft={2}>
-				<Text>Our race count {our_race_count}</Text>
-			</Box>
 
 			{race_progress ? (
-				<Box marginLeft={2}>
+				<Box marginLeft={5} marginTop={1}>
 					<Text>
 						<Text color="green">
 							<Spinner type="dots" />
 						</Text>
-						{" Race in progress"}
+						{" Race in progress, people in queue: "}
+						{people_in_queue}
 					</Text>
 				</Box>
 			) : (

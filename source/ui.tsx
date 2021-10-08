@@ -9,54 +9,9 @@ import {
 
 import { config } from "./cli";
 import { player_info } from "./types";
-import Race from "./race";
 
-const DisplayRaceResults: FC<{
-	race_results: Array<any> | undefined;
-	realtime_race_count: number | undefined;
-}> = ({ race_results, realtime_race_count }) => {
-	if (race_results && realtime_race_count) {
-		return (
-			<Box marginLeft={2} marginTop={1}>
-				<Text>
-					Today's Race results: [{" "}
-					{race_results
-						.slice(0, realtime_race_count)
-						.map((race: any, index) => {
-							if (race.position === 1) {
-								return (
-									<Text color="greenBright" key={index}>
-										{race.position}st,{" "}
-									</Text>
-								);
-							} else if (race.position === 2) {
-								return (
-									<Text color="greenBright" key={index}>
-										{race.position}nd,{" "}
-									</Text>
-								);
-							} else if (race.position === 3) {
-								return (
-									<Text color="greenBright" key={index}>
-										{race.position}rd,{" "}
-									</Text>
-								);
-							} else {
-								return (
-									<Text color="greenBright" key={index}>
-										{race.position}th,{" "}
-									</Text>
-								);
-							}
-						})}
-					]
-				</Text>
-			</Box>
-		);
-	} else {
-		return <Box></Box>;
-	}
-};
+import Race from "./components/race";
+import DisplayRaceResults from "./components/displayResults";
 
 const App: FC<{
 	autorace?: boolean;
@@ -83,6 +38,11 @@ const App: FC<{
 	const [previous_results, SetPrevios_results] = useState<any[] | undefined>(
 		undefined
 	);
+	const [our_race_count, SetOur_race_count] = useState(0);
+
+	const changeOurRaceCountFromChild = (our_race_count: number) => {
+		SetOur_race_count(our_race_count);
+	};
 
 	const { account } = config;
 	const { exit } = useApp();
@@ -118,45 +78,51 @@ const App: FC<{
 			);
 			// SetRace_results(race_results_temp); // this is gonna be updated later in the Race component
 		}
-		fetchValues();
+		fetchValues().then(() => {
+			if (daily_race_count && daily_race_count >= 10) {
+				exit();
+			}
+		});
 	}, []);
 
 	return (
 		<Box flexGrow={1} flexDirection="column">
 			<Box
 				flexGrow={1}
-				// alignItems="center"
 				justifyContent="center"
 				flexDirection="row"
 				margin={1}
 				borderColor="green"
-				borderStyle="round"
+				borderStyle="classic"
 			>
 				{autorace ? (
-					<Text>---autorace---</Text>
+					<Text color="greenBright">---autorace---</Text>
 				) : (
 					<Text>---no-autorace---</Text>
 				)}
 			</Box>
-			<Box marginLeft={2} marginBottom={1}>
+			<Box marginLeft={5} marginBottom={1}>
 				<Text>
 					Snakeoil: <Text color="yellowBright">{snake_oil_balance}</Text>
 				</Text>
 			</Box>
-			<Box marginLeft={2}>
-				<Text>
-					Daily Race count:{" "}
-					<Text color="yellowBright">{realtime_race_count}</Text>
-				</Text>
+			<Box marginLeft={5}>
+				<Text>Daily Race count: </Text>
+				<Text color="yellowBright">{realtime_race_count}</Text>
+				{race_progress ? (
+					<>
+						<Text color="yellowBright"> +1 </Text>
+						<Text color="grey">(in progress)</Text>
+					</>
+				) : (
+					<></>
+				)}
 			</Box>
-			{race_progress ? (
-				<Box marginLeft={2}>
-					<Text color="yellowBright">+1 </Text>
-					<Text>Race is in progress</Text>
-				</Box>
-			) : (
-				<></>
-			)}
+
+			<Box marginLeft={5}>
+				<Text>Our race count: </Text>
+				<Text color="yellowBright">{our_race_count}</Text>
+			</Box>
 			<DisplayRaceResults
 				race_results={race_results}
 				realtime_race_count={realtime_race_count}
@@ -164,10 +130,21 @@ const App: FC<{
 
 			{daily_race_count && daily_race_count >= 10 ? (
 				<>
-					<Box marginLeft={2}>
-						<Text>Daily race limit of 10 reached, exiting...</Text>
+					<Box
+						flexGrow={1}
+						justifyContent="center"
+						flexDirection="row"
+						marginTop={3}
+						marginBottom={3}
+						marginLeft={9}
+						marginRight={9}
+						borderColor="red"
+						borderStyle="classic"
+					>
+						<Text color="red" bold>
+							Daily race limit of 10 races reached, exiting...
+						</Text>
 					</Box>
-					exit()
 				</>
 			) : (
 				<></>
@@ -194,6 +171,7 @@ const App: FC<{
 					Setrealtime_race_count={Setrealtime_race_count}
 					Setsnake_oil_balance={Setsnake_oil_balance}
 					config={config}
+					changeOurRaceCountFromChild={changeOurRaceCountFromChild}
 				/>
 			) : (
 				<></>
