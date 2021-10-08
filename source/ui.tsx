@@ -16,10 +16,7 @@ import DisplayRaceResults from "./components/displayResults";
 const App: FC<{
 	autorace?: boolean;
 	config: config;
-	drivers: Array<string>;
-	vehicles: Array<string>;
-	endpoint: string;
-}> = ({ autorace, config, drivers, vehicles, endpoint }) => {
+}> = ({ autorace, config }) => {
 	const [race_progress, Setrace_progress] = useState(false);
 	const [snake_oil_balance, Setsnake_oil_balance] = useState("");
 	const [realtime_race_count, Setrealtime_race_count] = useState<
@@ -79,7 +76,7 @@ const App: FC<{
 			// SetRace_results(race_results_temp); // this is gonna be updated later in the Race component
 		}
 		fetchValues().then(() => {
-			if (daily_race_count && daily_race_count >= 10) {
+			if (daily_race_count && daily_race_count >= 10 && !race_progress) {
 				exit();
 			}
 		});

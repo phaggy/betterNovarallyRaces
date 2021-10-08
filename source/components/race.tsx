@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { Box, Text, Newline, useApp } from "ink";
+import { Box, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 
 import { player_info } from "../types";
@@ -9,7 +9,6 @@ import {
 	get_snake_oil_balance,
 	is_race_in_progress,
 	get_race_results,
-	sleep,
 } from "../services";
 
 import { config } from "../cli";
@@ -33,8 +32,6 @@ const Race: FC<{
 	changeOurRaceCountFromChild: any;
 }> = ({
 	autorace,
-	previous_results,
-	player_info,
 	race_progress,
 	Setrace_progress,
 	account,
@@ -42,7 +39,6 @@ const Race: FC<{
 	daily_race_count,
 	SetDaily_race_count,
 	Setrealtime_race_count,
-	race_results,
 	SetRace_results,
 	config,
 	changeOurRaceCountFromChild,
@@ -112,11 +108,6 @@ const Race: FC<{
 
 	return (
 		<>
-			<Box marginLeft={5} marginTop={1}>
-				<Text>Previos Race result: </Text>
-				<Text color="yellowBright">{race_results[0].position}</Text>
-			</Box>
-
 			<Box marginLeft={5} marginTop={1}>
 				<Text>No. of people in queue </Text>
 				<Text color="yellowBright">{people_in_queue}</Text>
