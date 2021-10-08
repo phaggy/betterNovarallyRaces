@@ -21,7 +21,7 @@ const is_race_in_progress = async (account: string): Promise<boolean> => {
     show_payer: false,
   };
   try {
-    const result = await axios.post(
+    const result = await axios.post<any>(
       `${ENDPOINT}/v1/chain/get_table_rows`,
       data
     );
@@ -48,7 +48,7 @@ const get_people_in_queue = async (): Promise<number> => {
     show_payer: false,
   };
   try {
-    const result = await axios.post(
+    const result = await axios.post<any>(
       `${ENDPOINT}/v1/chain/get_table_rows`,
       data
     );
@@ -62,7 +62,7 @@ const get_people_in_queue = async (): Promise<number> => {
 const get_snake_oil_balance = async (account: string): Promise<string> => {
   const data = { code: "novarallytok", account: account, symbol: null };
   try {
-    const result = await axios.post(
+    const result = await axios.post<any>(
       `${ENDPOINT}/v1/chain/get_currency_balance`,
       data
     );
@@ -87,7 +87,7 @@ const get_race_results = async (account: string) => {
     show_payer: false,
   };
   try {
-    const result = await axios.post(
+    const result = await axios.post<any>(
       `${ENDPOINT}/v1/chain/get_table_rows`,
       data
     );
@@ -112,7 +112,7 @@ const get_player_info = async (account: string): Promise<player_info> => {
     show_payer: false,
   };
   try {
-    const result = await axios.post(
+    const result = await axios.post<any>(
       `${ENDPOINT}/v1/chain/get_table_rows`,
       data
     );
