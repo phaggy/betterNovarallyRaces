@@ -60,7 +60,7 @@ const get_people_in_queue = async (): Promise<number> => {
 };
 
 const get_snake_oil_balance = async (account: string): Promise<string> => {
-  const data = { code: "novarallytok", account: "buttnuster24", symbol: null };
+  const data = { code: "novarallytok", account: account, symbol: null };
   try {
     const result = await axios.post(
       `${ENDPOINT}/v1/chain/get_currency_balance`,
