@@ -59,4 +59,6 @@ if (!vehicle_asset_id || !driver1_asset_id || !driver2_asset_id) {
 	process.exit();
 }
 
+export { config as config_values };
+
 render(<App autorace={cli.flags.autorace} config={config} />);

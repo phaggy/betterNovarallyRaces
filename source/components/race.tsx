@@ -108,11 +108,6 @@ const Race: FC<{
 
 	return (
 		<>
-			<Box marginLeft={5} marginTop={1}>
-				<Text>No. of people in queue </Text>
-				<Text color="yellowBright">{people_in_queue}</Text>
-			</Box>
-
 			{race_progress ? (
 				<Box marginLeft={5} marginTop={1}>
 					<Text>
