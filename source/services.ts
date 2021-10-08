@@ -4,7 +4,12 @@ import { ENDPOINT } from "./cli";
 import { doTrx } from "./doTrx";
 import { player_info } from "./types";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number): Promise<void> =>
+	new Promise((resolve) => setTimeout(resolve, ms));
+
+const get_days = (time_in_milli: number): number => {
+	return Math.floor(time_in_milli / (1000 * 60 * 60 * 24));
+};
 
 const is_race_in_progress = async (account: string): Promise<boolean> => {
 	const data = {
@@ -27,9 +32,10 @@ const is_race_in_progress = async (account: string): Promise<boolean> => {
 		);
 		if (result.data.rows.length > 0) return true;
 		else return false;
-	} catch (err) {
-		// console.error(err);
-		return true;
+	} catch (err: any) {
+		console.error("couldnt fetch race progress", err.message);
+		await sleep(2000);
+		return is_race_in_progress(account);
 	}
 };
 
@@ -53,9 +59,10 @@ const get_people_in_queue = async (): Promise<number> => {
 			data
 		);
 		return result.data.rows.length;
-	} catch (err) {
-		// console.error(err);
-		return 0;
+	} catch (err: any) {
+		console.error("couldnt get people in queue", err.message);
+		await sleep(3000);
+		return get_people_in_queue();
 	}
 };
 
@@ -68,6 +75,7 @@ const get_snake_oil_balance = async (account: string): Promise<string> => {
 		);
 		return result.data[0];
 	} catch (err) {
+		await sleep(3000);
 		return get_snake_oil_balance(account);
 	}
 };
@@ -106,7 +114,6 @@ const get_player_info = async (account: string): Promise<player_info> => {
 		lower_bound: "",
 		upper_bound: "",
 		index_position: 1,
-		key_type: "",
 		limit: 10,
 		reverse: false,
 		show_payer: false,
@@ -119,12 +126,13 @@ const get_player_info = async (account: string): Promise<player_info> => {
 		return result.data.rows[0];
 	} catch (err: any) {
 		console.log(err.message);
-		console.log("trying to fetch player info again");
+		await sleep(2000);
+		// console.log("trying to fetch player info again");
 		return get_player_info(account);
 	}
 };
 
-const do_race = async (
+const execute_race_action = async (
 	account: string,
 	vehicle_asset_id: string,
 	driver1_asset_id: string,
@@ -168,10 +176,11 @@ const do_race = async (
 };
 
 export {
-	do_race,
+	execute_race_action,
 	sleep,
 	is_race_in_progress,
 	get_race_results,
+	get_days,
 	get_player_info,
 	get_snake_oil_balance,
 	get_people_in_queue,

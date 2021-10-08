@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { Box, Text } from "ink";
+import { Box, Text, useApp } from "ink";
 import {
 	is_race_in_progress,
 	get_player_info,
@@ -17,7 +17,7 @@ const DisplayRaceResults: FC<{
 }> = ({ race_results, realtime_race_count }) => {
 	if (race_results && realtime_race_count) {
 		return (
-			<Box marginLeft={1} marginTop={1}>
+			<Box marginLeft={2} marginTop={1}>
 				<Text>
 					Today's Race results: [{" "}
 					{race_results
@@ -67,19 +67,25 @@ const App: FC<{
 }> = ({ autorace, config, drivers, vehicles, endpoint }) => {
 	const [race_progress, Setrace_progress] = useState(false);
 	const [snake_oil_balance, Setsnake_oil_balance] = useState("");
-	const [player_info, Setplayer_info] = useState<player_info | undefined>(
-		undefined
-	);
 	const [realtime_race_count, Setrealtime_race_count] = useState<
 		number | undefined
-	>(undefined);
+	>(undefined); // this is displayed in the console
 	const [race_results, SetRace_results] = useState<Array<any> | undefined>(
 		undefined
 	);
-	const [previous_results, SetPrevious_results] = useState<any[] | undefined>(
+
+	const [player_info, SetPlayer_info] = useState<player_info | undefined>(
 		undefined
 	);
+	const [daily_race_count, SetDaily_race_count] = useState<number | undefined>(
+		undefined
+	); // this is used to check if limit of 10 has been reached
+	const [previous_results, SetPrevios_results] = useState<any[] | undefined>(
+		undefined
+	);
+
 	const { account } = config;
+	const { exit } = useApp();
 
 	useEffect(() => {
 		async function fetchValues() {
@@ -87,23 +93,30 @@ const App: FC<{
 				player_info_temp,
 				race_progress_temp,
 				snake_oil_balance_temp,
-				race_results_temp,
+				previous_results_temp,
 			] = await Promise.all([
 				get_player_info(account),
 				is_race_in_progress(account),
 				get_snake_oil_balance(account),
 				get_race_results(account),
 			]);
-			Setplayer_info(player_info_temp);
+
+			// prolly not gonna be updated
+			SetPlayer_info(player_info_temp);
+			SetPrevios_results(previous_results_temp);
+			SetDaily_race_count(player_info_temp.daily_race_count);
+
+			// reactive variables
 			Setsnake_oil_balance(snake_oil_balance_temp);
 			Setrace_progress(race_progress_temp);
+			SetRace_results(previous_results_temp);
+
 			Setrealtime_race_count(
 				race_progress_temp
 					? player_info_temp.daily_race_count - 1
 					: player_info_temp.daily_race_count
 			);
-			SetRace_results(race_results_temp); // this is gonna be updated later in the Race component
-			SetPrevious_results(race_results_temp); // this is not gonna be updated outside this file
+			// SetRace_results(race_results_temp); // this is gonna be updated later in the Race component
 		}
 		fetchValues();
 	}, []);
@@ -116,6 +129,8 @@ const App: FC<{
 				justifyContent="center"
 				flexDirection="row"
 				margin={1}
+				borderColor="green"
+				borderStyle="round"
 			>
 				{autorace ? (
 					<Text>---autorace---</Text>
@@ -123,20 +138,21 @@ const App: FC<{
 					<Text>---no-autorace---</Text>
 				)}
 			</Box>
-			<Box marginLeft={1} marginBottom={1}>
+			<Box marginLeft={2} marginBottom={1}>
 				<Text>
 					Snakeoil: <Text color="yellowBright">{snake_oil_balance}</Text>
 				</Text>
 			</Box>
-			<Box marginLeft={1}>
+			<Box marginLeft={2}>
 				<Text>
 					Daily Race count:{" "}
 					<Text color="yellowBright">{realtime_race_count}</Text>
 				</Text>
 			</Box>
 			{race_progress ? (
-				<Box marginLeft={1}>
-					<Text>+1 Race is in progress</Text>
+				<Box marginLeft={2}>
+					<Text color="yellowBright">+1 </Text>
+					<Text>Race is in progress</Text>
 				</Box>
 			) : (
 				<></>
@@ -145,24 +161,42 @@ const App: FC<{
 				race_results={race_results}
 				realtime_race_count={realtime_race_count}
 			/>
-			{previous_results &&
+
+			{daily_race_count && daily_race_count >= 10 ? (
+				<>
+					<Box marginLeft={2}>
+						<Text>Daily race limit of 10 reached, exiting...</Text>
+					</Box>
+					exit()
+				</>
+			) : (
+				<></>
+			)}
+
+			{daily_race_count &&
+			previous_results &&
 			race_results &&
 			player_info &&
-			realtime_race_count ? (
+			realtime_race_count &&
+			daily_race_count < 10 ? (
 				<Race
+					autorace={autorace}
 					previous_results={previous_results}
-					SetPrevious_results={SetPrevious_results}
 					race_results={race_results}
 					SetRace_results={SetRace_results}
 					player_info={player_info}
-					Setplayer_info={Setplayer_info}
 					account={account}
 					race_progress={race_progress}
 					Setrace_progress={Setrace_progress}
-					daily_race_count={realtime_race_count}
+					daily_race_count={daily_race_count}
+					SetDaily_race_count={SetDaily_race_count}
+					realtime_race_count={realtime_race_count}
+					Setrealtime_race_count={Setrealtime_race_count}
+					Setsnake_oil_balance={Setsnake_oil_balance}
+					config={config}
 				/>
 			) : (
-				<Box></Box>
+				<></>
 			)}
 		</Box>
 	);
