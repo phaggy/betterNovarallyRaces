@@ -9,6 +9,7 @@ import {
 	get_snake_oil_balance,
 	is_race_in_progress,
 	get_race_results,
+	sleep,
 } from "../services";
 
 import { config } from "../cli";
@@ -26,10 +27,12 @@ const Race: FC<{
 	realtime_race_count: number;
 	Setrealtime_race_count: React.Dispatch<number>;
 	daily_race_count: number;
-	SetDaily_race_count: React.Dispatch<number>;
+	SetDaily_race_count: React.Dispatch<React.SetStateAction<number | undefined>>;
 	Setsnake_oil_balance: React.Dispatch<React.SetStateAction<string>>;
 	config: config;
-	changeOurRaceCountFromChild: any;
+	our_race_count: number;
+	SetOur_race_count: React.Dispatch<React.SetStateAction<number>>;
+	exit: any;
 }> = ({
 	autorace,
 	race_progress,
@@ -41,17 +44,19 @@ const Race: FC<{
 	Setrealtime_race_count,
 	SetRace_results,
 	config,
-	changeOurRaceCountFromChild,
+	our_race_count,
+	SetOur_race_count,
+	exit,
 }) => {
 	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
 		undefined
 	);
-	const [our_race_count, SetOur_race_count] = useState(0);
-
-	const { exit } = useApp();
 
 	useEffect(() => {
+		let mounted = true;
+		let interval_id: NodeJS.Timer | undefined = undefined;
 		async function update() {
+			await sleep(500);
 			const [
 				raceprog_temp,
 				plinfo_temp,
@@ -77,32 +82,45 @@ const Race: FC<{
 			);
 			SetRace_results(race_results_temp);
 		}
-		update().then(() => {
-			race_progress_updater();
-		});
+
+		if (mounted)
+			update().then(() => {
+				interval_id = race_progress_updater();
+			});
+
+		return function cleanup() {
+			mounted = false;
+			if (interval_id) clearInterval(interval_id); // stops fetching shit when told to
+		};
 	}, [race_progress]); // updates data everytime race progress changes
 
 	const race_progress_updater = () => {
-		if (!autorace && our_race_count >= 1) {
+		if (!autorace && our_race_count >= 1 && !race_progress) {
+			console.log(
+				"exiting race.tsx !autorace && our_race_count >= 1 && !race_progress"
+			);
 			exit();
-		} else if (race_progress != undefined && race_progress)
-			setInterval(async () => {
+			return undefined;
+		} else if (race_progress != undefined && race_progress) {
+			const interval = setInterval(async () => {
 				Setrace_progress(await is_race_in_progress(account));
 				SetPeople_in_queue(await get_people_in_queue());
 			}, 5000);
-		else {
-			do_race(account, race_progress, daily_race_count, config).then(
-				async (result) => {
-					if (result) {
-						SetOur_race_count(
-							(current_our_race_count) => current_our_race_count + result
-						);
-						changeOurRaceCountFromChild(our_race_count);
-						Setrace_progress(await is_race_in_progress(account));
-						SetPeople_in_queue(await get_people_in_queue());
-					}
+			return interval;
+		} else {
+			do_race(race_progress, daily_race_count, config).then(async (result) => {
+				if (result != undefined) {
+					SetOur_race_count(
+						(current_our_race_count) => current_our_race_count + result
+					);
+					Setrace_progress(await is_race_in_progress(account));
+					SetPeople_in_queue(await get_people_in_queue());
+				} else {
+					console.log("exiting race.tsx result=undefined");
+					exit();
 				}
-			);
+			});
+			return undefined;
 		}
 	};
 

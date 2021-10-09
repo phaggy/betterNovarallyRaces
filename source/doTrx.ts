@@ -1,24 +1,22 @@
 import { Api, JsonRpc } from "eosjs";
 import { JsSignatureProvider } from "eosjs/dist/eosjs-jssig";
 import fetch from "node-fetch"; //node only
-
-import { config_values } from "./cli";
+import { config } from "./cli";
 
 const ENDPOINT = "https://wax.pink.gg";
 
-const { private_key } = config_values;
-const privateKeys = [private_key];
-
-const signatureProvider = new JsSignatureProvider(privateKeys);
 const rpc = new JsonRpc(ENDPOINT, { fetch }); //required to read blockchain state
-export const api = new Api({
-	rpc,
-	signatureProvider,
-	textDecoder: new TextDecoder(),
-	textEncoder: new TextEncoder(),
-});
 
-export const doTrx = async (newActions: Array<any>) => {
+export const doTrx = async (newActions: Array<any>, config: config) => {
+	const { private_key } = config;
+	const privateKeys = [private_key];
+	const signatureProvider = new JsSignatureProvider(privateKeys);
+	const api = new Api({
+		rpc,
+		signatureProvider,
+		textDecoder: new TextDecoder(),
+		textEncoder: new TextEncoder(),
+	});
 	try {
 		// console.dir({ newActions }, { depth: null });
 		await api.transact(

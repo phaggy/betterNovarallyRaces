@@ -44,7 +44,7 @@ const DisplayRaceResults: FC<{
 					</Text>
 				</Box>
 				<Box marginLeft={5} marginTop={1}>
-					<Text>Previos Race result: </Text>
+					<Text>Previous Race result: </Text>
 					<Text color="yellowBright">{race_results[0].position}</Text>
 				</Box>
 			</>

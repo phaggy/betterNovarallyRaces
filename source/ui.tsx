@@ -12,6 +12,7 @@ import { player_info } from "./types";
 
 import Race from "./components/race";
 import DisplayRaceResults from "./components/displayResults";
+import DisplayPrizes from "./components/displayPrizes";
 
 const App: FC<{
 	autorace?: boolean;
@@ -35,16 +36,19 @@ const App: FC<{
 	const [previous_results, SetPrevios_results] = useState<any[] | undefined>(
 		undefined
 	);
+	const [pending_prizes, SetPending_prizes] = useState<any[] | []>([]);
 	const [our_race_count, SetOur_race_count] = useState(0);
 
-	const changeOurRaceCountFromChild = (our_race_count: number) => {
-		SetOur_race_count(our_race_count);
-	};
+	// const changeOurRaceCountFromChild = (our_race_count: number) => {
+	// 	SetOur_race_count(our_race_count);
+	// };
 
 	const { account } = config;
 	const { exit } = useApp();
 
 	useEffect(() => {
+		let mounted = true;
+
 		async function fetchValues() {
 			const [
 				player_info_temp,
@@ -58,28 +62,36 @@ const App: FC<{
 				get_race_results(account),
 			]);
 
-			// prolly not gonna be updated
 			SetPlayer_info(player_info_temp);
 			SetPrevios_results(previous_results_temp);
 			SetDaily_race_count(player_info_temp.daily_race_count);
 
-			// reactive variables
 			Setsnake_oil_balance(snake_oil_balance_temp);
 			Setrace_progress(race_progress_temp);
 			SetRace_results(previous_results_temp);
+			SetPending_prizes(player_info_temp.pending_prizes);
 
 			Setrealtime_race_count(
 				race_progress_temp
 					? player_info_temp.daily_race_count - 1
 					: player_info_temp.daily_race_count
 			);
-			// SetRace_results(race_results_temp); // this is gonna be updated later in the Race component
 		}
-		fetchValues().then(() => {
-			if (daily_race_count && daily_race_count >= 10 && !race_progress) {
-				exit();
-			}
-		});
+
+		if (mounted) {
+			fetchValues().then(() => {
+				if (daily_race_count && daily_race_count >= 10 && !race_progress) {
+					console.log(
+						"exiting from ui.tsx , daily_race_count && daily_race_count >= 10 && !race_progress"
+					);
+					exit();
+				}
+			});
+		} 
+
+		return function cleanup() {
+			mounted = false;
+					};
 	}, []);
 
 	return (
@@ -90,7 +102,7 @@ const App: FC<{
 				flexDirection="row"
 				margin={1}
 				borderColor="green"
-				borderStyle="classic"
+				borderStyle="round"
 			>
 				{autorace ? (
 					<Text color="greenBright">---autorace---</Text>
@@ -98,10 +110,17 @@ const App: FC<{
 					<Text>---no-autorace---</Text>
 				)}
 			</Box>
-			<Box marginLeft={5} marginBottom={1}>
+			<Box marginLeft={5}>
 				<Text>
 					Snakeoil: <Text color="yellowBright">{snake_oil_balance}</Text>
 				</Text>
+			</Box>
+			<Box marginTop={1}>
+				{pending_prizes.length > 0 ? (
+					<DisplayPrizes pending_prizes={pending_prizes} />
+				) : (
+					<></>
+				)}
 			</Box>
 			<Box marginLeft={5}>
 				<Text>Daily Race count: </Text>
@@ -125,7 +144,7 @@ const App: FC<{
 				realtime_race_count={realtime_race_count}
 			/>
 
-			{daily_race_count && daily_race_count >= 10 ? (
+			{daily_race_count && daily_race_count >= 10 && !race_progress ? (
 				<>
 					<Box
 						flexGrow={1}
@@ -152,7 +171,7 @@ const App: FC<{
 			race_results &&
 			player_info &&
 			realtime_race_count &&
-			daily_race_count < 10 ? (
+			daily_race_count <= 10 ? (
 				<Race
 					autorace={autorace}
 					previous_results={previous_results}
@@ -168,7 +187,9 @@ const App: FC<{
 					Setrealtime_race_count={Setrealtime_race_count}
 					Setsnake_oil_balance={Setsnake_oil_balance}
 					config={config}
-					changeOurRaceCountFromChild={changeOurRaceCountFromChild}
+					SetOur_race_count={SetOur_race_count}
+					our_race_count={our_race_count}
+					exit={exit}
 				/>
 			) : (
 				<></>

@@ -8,7 +8,9 @@
 	},
 	"scripts": {
 		"build": "npx tsc && npx webpack --mode=production && npx pkg package.json --no-bytecode -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip",
-		"quick-build": "npx tsc && npx webpack --mode=development && npx pkg package.json --no-bytecode -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 -d"
+		"quick-build": "npx tsc && npx webpack --mode=development && npx pkg package.json --no-bytecode -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 -d",
+		"start": "cd source && npx ts-node cli.tsx",
+		"start-js": "cd build && node js/cli.js"
 	},
 	"dependencies": {
 		"axios": "^0.22.0",

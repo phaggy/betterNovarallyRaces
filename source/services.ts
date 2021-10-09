@@ -3,6 +3,7 @@ import { ENDPOINT } from "./cli";
 
 import { doTrx } from "./doTrx";
 import { player_info } from "./types";
+import { config } from "./cli";
 
 const sleep = (ms: number): Promise<void> =>
 	new Promise((resolve) => setTimeout(resolve, ms));
@@ -132,12 +133,10 @@ const get_player_info = async (account: string): Promise<player_info> => {
 	}
 };
 
-const execute_race_action = async (
-	account: string,
-	vehicle_asset_id: string,
-	driver1_asset_id: string,
-	driver2_asset_id: string
-) => {
+const execute_race_action = async (config: config) => {
+	const { account, drivers, vehicles } = config;
+	const [driver1_asset_id, driver2_asset_id] = drivers;
+	const [vehicle_asset_id] = vehicles;
 	const actions = [
 		{
 			account: "novarallytok",
@@ -145,7 +144,7 @@ const execute_race_action = async (
 			authorization: [
 				{
 					actor: account,
-					permission: "owner",
+					permission: "active",
 				},
 			],
 			data: {
@@ -161,7 +160,7 @@ const execute_race_action = async (
 			authorization: [
 				{
 					actor: account,
-					permission: "owner",
+					permission: "active",
 				},
 			],
 			data: {
@@ -172,7 +171,7 @@ const execute_race_action = async (
 			},
 		},
 	];
-	await doTrx(actions);
+	await doTrx(actions, config);
 };
 
 export {
