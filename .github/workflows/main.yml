@@ -37,5 +37,6 @@ jobs:
           repo_token: "${{ secrets.RELEASE_TOKEN }}"
           prerelease: false
           files: |
+            assets/*
             build/binaries/*
             src/config.json

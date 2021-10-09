@@ -67,7 +67,6 @@ module.exports = {
 									node: true,
 								},
 								modules: "commonjs",
-								debug: true,
 							},
 						],
 					],

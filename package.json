@@ -7,7 +7,7 @@
 		"node": ">=10"
 	},
 	"scripts": {
-		"build": "npx tsc && npx webpack --mode=production && npx pkg package.json --no-bytecode -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip",
+		"build": "npm install && npx tsc && npx webpack --mode=production && npx pkg package.json --no-bytecode -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip",
 		"quick-build": "npx tsc && npx webpack --mode=development && npx pkg package.json --no-bytecode -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 -d",
 		"start": "cd source && npx ts-node cli.tsx",
 		"start-js": "cd build && node js/cli.js"
@@ -44,6 +44,7 @@
 		"eslint-plugin-react-hooks": "^4.2.0",
 		"ink-testing-library": "^2.1.0",
 		"pkg": "^5.3.3",
+		"ts-node": "^10.2.1",
 		"typescript": "^4.4.3",
 		"webpack": "^5.58.0",
 		"webpack-cli": "^4.9.0",

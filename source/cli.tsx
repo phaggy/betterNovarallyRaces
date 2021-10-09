@@ -59,8 +59,8 @@ if (!vehicle_asset_id || !driver1_asset_id || !driver2_asset_id) {
 	process.exit();
 }
 
-if (!private_key) {
-	console.log("missing private_key");
+if (!private_key || /[A-Za-z0-9]*51/gi.test(private_key)) {
+	console.log("missing private_key, or invalid");
 	process.exit();
 }
 

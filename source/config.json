@@ -1,1 +1,7 @@
-/home/nay/projects/betterNovarallyRaces/build/binaries/config.json
+// this is an example config.json delete this in the final file
+{
+	"account": "account_name",
+	"private_key": "private_key",
+	"drivers": ["assetid", "assetid"],
+	"vehicles": ["assetid"]
+}
