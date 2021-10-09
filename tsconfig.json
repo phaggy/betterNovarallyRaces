@@ -1,15 +1,15 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./build"
-  },
-  "include": ["src/**/**.ts"],
-  "exclude": ["node_modues", "data", "types.ts"]
+	"compilerOptions": {
+		"target": "ES2021",
+		"module": "commonjs",
+		"jsx": "react",
+		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"outDir": "build/js"
+	},
+	"include": ["source"]
 }
