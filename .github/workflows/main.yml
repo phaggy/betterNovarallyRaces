@@ -2,13 +2,11 @@ name: NodeJS with pkg and tsc
 
 on:
   push:
-    tags:
-      - "!v*-rc*"
-      - "v*"
-  pull_request:
-    tags:
-      - "!v*-rc*"
-      - "v*"
+    tags: v[1-9]+.[0-9]+.[0-9]+
+  # pull_request:
+  #   tags:
+  #     - "!v*-rc*"
+  #     - "v*"
 
 jobs:
   build:
@@ -30,8 +28,9 @@ jobs:
         run: |
           npm install
           npx tsc
-          cd build
-          npx pkg index.js -o binaries/race --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip
+          npx webpack --mode=production
+          cd build/js
+          npx pkg package.json --no-bytecode -o binaries/race --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip
         
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
