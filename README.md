@@ -5,7 +5,7 @@ a more reliable way to novarally race
 ### grab the appropriate binary from releases and the example config.json
 * fill the details into config.json make sure you place the config.json and the application in the same folder
 * navigate to where you saved the file in your terminal
-* RUN IT! (```linux,mac-os: ./race``` ```windows, cmd: race, windows-terminal: .\race```)
+* RUN IT! (```linux,mac-os: ./race-linux or ./race-macos``` ```windows, cmd: race-win.exe, windows-terminal: .\race-win.exe```)
 
 ## OR
 
