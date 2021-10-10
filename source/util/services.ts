@@ -1,9 +1,9 @@
 import axios from "axios";
-import { ENDPOINT } from "./cli";
+import { ENDPOINT } from "../cli";
 
 import { doTrx } from "./doTrx";
 import { player_info } from "./types";
-import { config } from "./cli";
+import { config } from "../cli";
 
 const sleep = (ms: number): Promise<void> =>
 	new Promise((resolve) => setTimeout(resolve, ms));
@@ -134,7 +134,7 @@ const get_player_info = async (account: string): Promise<player_info> => {
 };
 
 const execute_race_action = async (config: config) => {
-	const { account, drivers, vehicles } = config;
+	const { account, drivers, vehicles, permission } = config;
 	const [driver1_asset_id, driver2_asset_id] = drivers;
 	const [vehicle_asset_id] = vehicles;
 	const actions = [
@@ -144,7 +144,7 @@ const execute_race_action = async (config: config) => {
 			authorization: [
 				{
 					actor: account,
-					permission: "active",
+					permission: permission || "race",
 				},
 			],
 			data: {
@@ -160,7 +160,7 @@ const execute_race_action = async (config: config) => {
 			authorization: [
 				{
 					actor: account,
-					permission: "active",
+					permission: permission || "race",
 				},
 			],
 			data: {

@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from "react";
-import { Box, Text, useApp } from "ink";
+import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
 
-import { player_info } from "../types";
+import { player_info } from "../util/types";
 import {
 	get_people_in_queue,
 	get_player_info,
@@ -10,27 +10,28 @@ import {
 	is_race_in_progress,
 	get_race_results,
 	sleep,
-} from "../services";
+} from "../util/services";
 
 import { config } from "../cli";
-import do_race from "../doRace";
+import do_race from "../util/doRace";
 
 const Race: FC<{
 	autorace: boolean | undefined;
-	previous_results: Array<any>;
-	race_results: Array<any>;
+	previous_results: Array<any> | undefined;
+	race_results: Array<any> | undefined;
 	SetRace_results: React.Dispatch<React.SetStateAction<any[] | undefined>>;
-	player_info: player_info;
+	player_info: player_info | undefined;
 	account: string;
 	race_progress: boolean;
 	Setrace_progress: React.Dispatch<any>;
-	realtime_race_count: number;
+	realtime_race_count: number | undefined;
 	Setrealtime_race_count: React.Dispatch<number>;
-	daily_race_count: number;
+	daily_race_count: number | undefined;
 	SetDaily_race_count: React.Dispatch<React.SetStateAction<number | undefined>>;
 	Setsnake_oil_balance: React.Dispatch<React.SetStateAction<string>>;
 	config: config;
 	our_race_count: number;
+	last_played_date: number | undefined;
 	SetOur_race_count: React.Dispatch<React.SetStateAction<number>>;
 	exit: any;
 }> = ({
@@ -45,6 +46,7 @@ const Race: FC<{
 	SetRace_results,
 	config,
 	our_race_count,
+	last_played_date,
 	SetOur_race_count,
 	exit,
 }) => {
@@ -89,12 +91,16 @@ const Race: FC<{
 			});
 
 		return function cleanup() {
+			console.log("unmounted");
+
 			mounted = false;
 			if (interval_id) clearInterval(interval_id); // stops fetching shit when told to
 		};
 	}, [race_progress]); // updates data everytime race progress changes
 
 	const race_progress_updater = () => {
+		console.log("race progress updater");
+
 		if (!autorace && our_race_count >= 1 && !race_progress) {
 			console.log(
 				"exiting race.tsx !autorace && our_race_count >= 1 && !race_progress"
@@ -102,24 +108,32 @@ const Race: FC<{
 			exit();
 			return undefined;
 		} else if (race_progress != undefined && race_progress) {
+			console.log("else if ");
 			const interval = setInterval(async () => {
 				Setrace_progress(await is_race_in_progress(account));
 				SetPeople_in_queue(await get_people_in_queue());
 			}, 5000);
 			return interval;
 		} else {
-			do_race(race_progress, daily_race_count, config).then(async (result) => {
-				if (result != undefined) {
-					SetOur_race_count(
-						(current_our_race_count) => current_our_race_count + result
-					);
-					Setrace_progress(await is_race_in_progress(account));
-					SetPeople_in_queue(await get_people_in_queue());
-				} else {
-					console.log("exiting race.tsx result=undefined");
-					exit();
-				}
-			});
+			console.log("else");
+			console.log(daily_race_count, last_played_date);
+			if (daily_race_count && last_played_date) {
+				console.log("else>if");
+				do_race(race_progress, daily_race_count, last_played_date, config).then(
+					async (result) => {
+						if (result != undefined) {
+							SetOur_race_count(
+								(current_our_race_count) => current_our_race_count + result
+							);
+							Setrace_progress(await is_race_in_progress(account));
+							SetPeople_in_queue(await get_people_in_queue());
+						} else {
+							console.log("exiting race.tsx result=undefined");
+							exit();
+						}
+					}
+				);
+			}
 			return undefined;
 		}
 	};
@@ -137,7 +151,7 @@ const Race: FC<{
 					</Text>
 				</Box>
 			) : (
-				<></>
+				<Box marginLeft={5} marginTop={1}></Box>
 			)}
 		</>
 	);

@@ -1,7 +1,7 @@
-// this is an example config.json delete this in the final file
+// this is an example config.json, delete this line before running the script
 {
-	"account": "account_name",
+	"account": "accountname",
 	"private_key": "private_key",
-	"drivers": ["assetid", "assetid"],
-	"vehicles": ["assetid"]
+	"drivers": ["asset_id", "asset_id"],
+	"vehicles": ["asset_id"]
 }

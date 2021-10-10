@@ -1,7 +1,7 @@
 import { Api, JsonRpc } from "eosjs";
 import { JsSignatureProvider } from "eosjs/dist/eosjs-jssig";
 import fetch from "node-fetch"; //node only
-import { config } from "./cli";
+import { config } from "../cli";
 
 const ENDPOINT = "https://wax.pink.gg";
 

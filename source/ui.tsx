@@ -5,10 +5,11 @@ import {
 	get_player_info,
 	get_snake_oil_balance,
 	get_race_results,
-} from "./services";
+	get_days,
+} from "./util/services";
 
 import { config } from "./cli";
-import { player_info } from "./types";
+import { player_info } from "./util/types";
 
 import Race from "./components/race";
 import DisplayRaceResults from "./components/displayResults";
@@ -38,6 +39,9 @@ const App: FC<{
 	);
 	const [pending_prizes, SetPending_prizes] = useState<any[] | []>([]);
 	const [our_race_count, SetOur_race_count] = useState(0);
+	const [last_played_date, SetLast_played_date] = useState<number | undefined>(
+		undefined
+	);
 
 	// const changeOurRaceCountFromChild = (our_race_count: number) => {
 	// 	SetOur_race_count(our_race_count);
@@ -65,7 +69,7 @@ const App: FC<{
 			SetPlayer_info(player_info_temp);
 			SetPrevios_results(previous_results_temp);
 			SetDaily_race_count(player_info_temp.daily_race_count);
-
+			SetLast_played_date(player_info_temp.last_played_date);
 			Setsnake_oil_balance(snake_oil_balance_temp);
 			Setrace_progress(race_progress_temp);
 			SetRace_results(previous_results_temp);
@@ -80,18 +84,24 @@ const App: FC<{
 
 		if (mounted) {
 			fetchValues().then(() => {
-				if (daily_race_count && daily_race_count >= 10 && !race_progress) {
+				if (
+					last_played_date &&
+					daily_race_count &&
+					daily_race_count >= 10 &&
+					!race_progress &&
+					get_days(Date.now() - last_played_date * 1000) < 1
+				) {
 					console.log(
 						"exiting from ui.tsx , daily_race_count && daily_race_count >= 10 && !race_progress"
 					);
 					exit();
 				}
 			});
-		} 
+		}
 
 		return function cleanup() {
 			mounted = false;
-					};
+		};
 	}, []);
 
 	return (
@@ -144,7 +154,11 @@ const App: FC<{
 				realtime_race_count={realtime_race_count}
 			/>
 
-			{daily_race_count && daily_race_count >= 10 && !race_progress ? (
+			{last_played_date &&
+			daily_race_count &&
+			daily_race_count >= 10 &&
+			!race_progress &&
+			get_days(Date.now() - last_played_date * 1000) < 1 ? (
 				<>
 					<Box
 						flexGrow={1}
@@ -165,13 +179,7 @@ const App: FC<{
 			) : (
 				<></>
 			)}
-
-			{daily_race_count &&
-			previous_results &&
-			race_results &&
-			player_info &&
-			realtime_race_count &&
-			daily_race_count <= 10 ? (
+			{daily_race_count && last_played_date ? (
 				<Race
 					autorace={autorace}
 					previous_results={previous_results}
@@ -189,6 +197,7 @@ const App: FC<{
 					config={config}
 					SetOur_race_count={SetOur_race_count}
 					our_race_count={our_race_count}
+					last_played_date={last_played_date}
 					exit={exit}
 				/>
 			) : (
