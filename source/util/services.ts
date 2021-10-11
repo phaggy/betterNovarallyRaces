@@ -2,7 +2,7 @@ import axios from "axios";
 import { ENDPOINT } from "../cli";
 
 import { doTrx } from "./doTrx";
-import { player_info } from "./types";
+import { balance, player_info } from "./types";
 import { config } from "../cli";
 
 const sleep = (ms: number): Promise<void> =>
@@ -78,6 +78,30 @@ const get_snake_oil_balance = async (account: string): Promise<string> => {
 	} catch (err) {
 		await sleep(3000);
 		return get_snake_oil_balance(account);
+	}
+};
+
+const get_snake__balance = async (account: string): Promise<Array<balance>> => {
+	const data = {
+		json: true,
+		code: "novarallytok",
+		scope: account,
+		table: "accounts",
+		index_position: 1,
+		key_type: "",
+		limit: 10,
+		reverse: false,
+		show_payer: false,
+	};
+	try {
+		const result = await axios.post<any>(
+			`${ENDPOINT}/v1/chain/get_table_rows`,
+			data
+		);
+		return result.data.rows;
+	} catch (err) {
+		await sleep(3000);
+		return get_snake__balance(account);
 	}
 };
 
@@ -186,4 +210,5 @@ export {
 	get_player_info,
 	get_snake_oil_balance,
 	get_people_in_queue,
+	get_snake__balance,
 };

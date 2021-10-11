@@ -6,14 +6,16 @@ import {
 	get_snake_oil_balance,
 	get_race_results,
 	get_days,
+	get_snake__balance,
 } from "./util/services";
 
 import { config } from "./cli";
-import { player_info } from "./util/types";
+import { balance, player_info } from "./util/types";
 
 import Race from "./components/race";
 import DisplayRaceResults from "./components/displayResults";
 import DisplayPrizes from "./components/displayPrizes";
+import Balances from "./components/displayBalance";
 
 const App: FC<{
 	autorace?: boolean;
@@ -23,7 +25,9 @@ const App: FC<{
 	const [race_progress, Setrace_progress] = useState<undefined | true | false>(
 		undefined
 	);
-	const [snake_oil_balance, Setsnake_oil_balance] = useState("");
+	const [snake__balance, Setsnake__balance] = useState<balance[] | undefined>(
+		undefined
+	);
 	const [realtime_race_count, Setrealtime_race_count] = useState<
 		number | undefined
 	>(undefined); // this is displayed in the console
@@ -60,12 +64,12 @@ const App: FC<{
 			const [
 				player_info_temp,
 				race_progress_temp,
-				snake_oil_balance_temp,
+				snake__balance_temp,
 				previous_results_temp,
 			] = await Promise.all([
 				get_player_info(account),
 				is_race_in_progress(account),
-				get_snake_oil_balance(account),
+				get_snake__balance(account),
 				get_race_results(account),
 			]);
 
@@ -73,7 +77,7 @@ const App: FC<{
 			SetPrevios_results(previous_results_temp);
 			SetDaily_race_count(player_info_temp.daily_race_count);
 			SetLast_played_date(player_info_temp.last_played_date);
-			Setsnake_oil_balance(snake_oil_balance_temp);
+			Setsnake__balance(snake__balance_temp);
 			Setrace_progress(race_progress_temp);
 			SetRace_results(previous_results_temp);
 			SetPending_prizes(player_info_temp.pending_prizes);
@@ -124,9 +128,7 @@ const App: FC<{
 				)}
 			</Box>
 			<Box marginLeft={5}>
-				<Text>
-					Snakeoil: <Text color="yellowBright">{snake_oil_balance}</Text>
-				</Text>
+				{snake__balance ? <Balances snake__balance={snake__balance} /> : <></>}
 			</Box>
 			<Box marginTop={1}>
 				{pending_prizes.length > 0 ? (
@@ -197,7 +199,7 @@ const App: FC<{
 					SetDaily_race_count={SetDaily_race_count}
 					realtime_race_count={realtime_race_count}
 					Setrealtime_race_count={Setrealtime_race_count}
-					Setsnake_oil_balance={Setsnake_oil_balance}
+					Setsnake__balance={Setsnake__balance}
 					config={config}
 					SetOur_race_count={SetOur_race_count}
 					our_race_count={our_race_count}

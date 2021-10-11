@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
 
-import { player_info } from "../util/types";
+import { balance, player_info } from "../util/types";
 import {
 	get_people_in_queue,
 	get_player_info,
@@ -10,6 +10,7 @@ import {
 	is_race_in_progress,
 	get_race_results,
 	sleep,
+	get_snake__balance,
 } from "../util/services";
 
 import { config } from "../cli";
@@ -29,7 +30,9 @@ const Race: FC<{
 	Setrealtime_race_count: React.Dispatch<number>;
 	daily_race_count: number | undefined;
 	SetDaily_race_count: React.Dispatch<React.SetStateAction<number | undefined>>;
-	Setsnake_oil_balance: React.Dispatch<React.SetStateAction<string>>;
+	Setsnake__balance: React.Dispatch<
+		React.SetStateAction<balance[] | undefined>
+	>;
 	config: config;
 	our_race_count: number;
 	last_played_date: number | undefined;
@@ -42,7 +45,7 @@ const Race: FC<{
 	race_progress,
 	Setrace_progress,
 	account,
-	Setsnake_oil_balance,
+	Setsnake__balance,
 	daily_race_count,
 	SetDaily_race_count,
 	Setrealtime_race_count,
@@ -65,19 +68,19 @@ const Race: FC<{
 			const [
 				raceprog_temp,
 				plinfo_temp,
-				snake_oil_balance,
+				snake__balance_temp,
 				people_in_queue_temp,
 				race_results_temp,
 			] = await Promise.all([
 				is_race_in_progress(account),
 				get_player_info(account),
-				get_snake_oil_balance(account),
+				get_snake__balance(account),
 				get_people_in_queue(),
 				get_race_results(account),
 			]);
 
 			Setrace_progress(raceprog_temp);
-			Setsnake_oil_balance(snake_oil_balance);
+			Setsnake__balance(snake__balance_temp);
 			SetPeople_in_queue(people_in_queue_temp);
 			SetDaily_race_count(plinfo_temp.daily_race_count);
 			Setrealtime_race_count(
