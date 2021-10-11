@@ -133,7 +133,10 @@ const get_player_info = async (account: string): Promise<player_info> => {
 	}
 };
 
-const execute_race_action = async (config: config) => {
+const execute_race_action = async (
+	config: config,
+	dryrun: boolean | undefined
+) => {
 	const { account, drivers, vehicles, permission } = config;
 	const [driver1_asset_id, driver2_asset_id] = drivers;
 	const [vehicle_asset_id] = vehicles;
@@ -171,7 +174,7 @@ const execute_race_action = async (config: config) => {
 			},
 		},
 	];
-	await doTrx(actions, config);
+	await doTrx(actions, config, dryrun);
 };
 
 export {

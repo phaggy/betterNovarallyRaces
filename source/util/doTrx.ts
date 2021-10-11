@@ -7,7 +7,11 @@ const ENDPOINT = "https://wax.pink.gg";
 
 const rpc = new JsonRpc(ENDPOINT, { fetch }); //required to read blockchain state
 
-export const doTrx = async (newActions: Array<any>, config: config) => {
+export const doTrx = async (
+	newActions: Array<any>,
+	config: config,
+	dryrun: boolean | undefined
+) => {
 	const { private_key } = config;
 	const privateKeys = [private_key];
 	const signatureProvider = new JsSignatureProvider(privateKeys);
@@ -19,15 +23,16 @@ export const doTrx = async (newActions: Array<any>, config: config) => {
 	});
 	try {
 		// console.dir({ newActions }, { depth: null });
-		await api.transact(
-			{
-				actions: newActions,
-			},
-			{
-				blocksBehind: 3,
-				expireSeconds: 30,
-			}
-		);
+		if (!dryrun)
+			await api.transact(
+				{
+					actions: newActions,
+				},
+				{
+					blocksBehind: 3,
+					expireSeconds: 30,
+				}
+			);
 	} catch (err: any) {
 		console.log("sus", err.message, "\n---");
 		throw err;

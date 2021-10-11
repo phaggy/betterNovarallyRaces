@@ -17,9 +17,12 @@ import DisplayPrizes from "./components/displayPrizes";
 
 const App: FC<{
 	autorace?: boolean;
+	dryrun?: boolean;
 	config: config;
-}> = ({ autorace, config }) => {
-	const [race_progress, Setrace_progress] = useState(false);
+}> = ({ autorace, dryrun, config }) => {
+	const [race_progress, Setrace_progress] = useState<undefined | true | false>(
+		undefined
+	);
 	const [snake_oil_balance, Setsnake_oil_balance] = useState("");
 	const [realtime_race_count, Setrealtime_race_count] = useState<
 		number | undefined
@@ -117,7 +120,7 @@ const App: FC<{
 				{autorace ? (
 					<Text color="greenBright">---autorace---</Text>
 				) : (
-					<Text>---no-autorace---</Text>
+					<Text color="greenBright">---no-autorace---</Text>
 				)}
 			</Box>
 			<Box marginLeft={5}>
@@ -179,9 +182,10 @@ const App: FC<{
 			) : (
 				<></>
 			)}
-			{daily_race_count && last_played_date ? (
+			{daily_race_count && last_played_date && race_progress != undefined ? (
 				<Race
 					autorace={autorace}
+					dryrun={dryrun}
 					previous_results={previous_results}
 					race_results={race_results}
 					SetRace_results={SetRace_results}

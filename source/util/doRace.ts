@@ -4,21 +4,25 @@ import { execute_race_action, sleep, get_days } from "./services";
 import { config } from "../cli";
 
 const do_race = async (
+	dryrun: boolean | undefined,
 	race_progress: boolean,
 	daily_race_count: number,
 	last_played_date: number,
 	config: config
 ): Promise<number | undefined> => {
+	console.log({ days: get_days(Date.now() - last_played_date * 1000) });
+	console.log({ dryrun });
+
 	if (
 		(!race_progress && daily_race_count < 10) ||
 		(!race_progress &&
 			get_days(Date.now() - last_played_date * 1000) >= 1 &&
 			daily_race_count <= 10)
 	) {
-		console.log("trying trx");
 		try {
-			await execute_race_action(config);
-			await sleep(500);
+			console.log("trying trx");
+			await execute_race_action(config, dryrun);
+			await sleep(500); // waiting for contract to reflect changes
 			return 1;
 		} catch (err) {
 			return 0;

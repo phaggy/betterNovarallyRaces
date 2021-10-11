@@ -3,7 +3,9 @@ import React from "react";
 import { render } from "ink";
 import meow from "meow";
 import App from "./ui";
+
 import fs from "fs";
+import path from "path";
 
 const cli = meow(
 	`
@@ -12,13 +14,20 @@ const cli = meow(
 
 	Options
 		--autorace
+		--dry-run (Wont do the trx but the whole program runs)
 
 	Examples
 	  $ ./betterNovarallyRaces --autorace
+	  $ ./betterNovarallyRaces [options] --dry-run
+
+	Options
 `,
 	{
 		flags: {
 			autorace: {
+				type: "boolean",
+			},
+			dryrun: {
 				type: "boolean",
 			},
 		},
@@ -36,7 +45,8 @@ export interface config {
 
 let config: config;
 try {
-	const raw = fs.readFileSync("./config.json");
+	console.log(path.resolve("config.json"));
+	const raw = fs.readFileSync(path.resolve("config.json"));
 	config = JSON.parse(raw.toString());
 } catch (err: any) {
 	console.error(err.message);
@@ -65,4 +75,10 @@ if (!private_key || !/[A-Za-z0-9]{51}/gi.test(private_key)) {
 	process.exit();
 }
 
-render(<App autorace={cli.flags.autorace} config={config} />);
+render(
+	<App
+		autorace={cli.flags.autorace}
+		dryrun={cli.flags.dryrun}
+		config={config}
+	/>
+);

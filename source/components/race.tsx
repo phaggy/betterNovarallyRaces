@@ -17,6 +17,7 @@ import do_race from "../util/doRace";
 
 const Race: FC<{
 	autorace: boolean | undefined;
+	dryrun: boolean | undefined;
 	previous_results: Array<any> | undefined;
 	race_results: Array<any> | undefined;
 	SetRace_results: React.Dispatch<React.SetStateAction<any[] | undefined>>;
@@ -36,6 +37,7 @@ const Race: FC<{
 	exit: any;
 }> = ({
 	autorace,
+	dryrun,
 	race_progress,
 	Setrace_progress,
 	account,
@@ -53,7 +55,7 @@ const Race: FC<{
 	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
 		undefined
 	);
-
+	console.log({ race_progress });
 	useEffect(() => {
 		let mounted = true;
 		let interval_id: NodeJS.Timer | undefined = undefined;
@@ -116,23 +118,30 @@ const Race: FC<{
 			return interval;
 		} else {
 			console.log("else");
-			console.log(daily_race_count, last_played_date);
 			if (daily_race_count && last_played_date) {
 				console.log("else>if");
-				do_race(race_progress, daily_race_count, last_played_date, config).then(
-					async (result) => {
-						if (result != undefined) {
-							SetOur_race_count(
-								(current_our_race_count) => current_our_race_count + result
-							);
-							Setrace_progress(await is_race_in_progress(account));
-							SetPeople_in_queue(await get_people_in_queue());
-						} else {
-							console.log("exiting race.tsx result=undefined");
-							exit();
-						}
+				do_race(
+					dryrun,
+					race_progress,
+					daily_race_count,
+					last_played_date,
+					config
+				).then(async (result) => {
+					if (result != undefined && result != 0) {
+						SetOur_race_count(
+							(current_our_race_count) => current_our_race_count + result
+						);
+						const [race_prog_temp, people_in_queue_temp] = await Promise.all([
+							await is_race_in_progress(account),
+							await get_people_in_queue(),
+						]);
+						Setrace_progress(race_prog_temp);
+						SetPeople_in_queue(people_in_queue_temp);
+					} else {
+						console.log(`exiting race.tsx result=${result}`);
+						exit();
 					}
-				);
+				});
 			}
 			return undefined;
 		}
