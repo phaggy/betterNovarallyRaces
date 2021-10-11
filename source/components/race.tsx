@@ -24,7 +24,7 @@ const Race: FC<{
 	player_info: player_info | undefined;
 	account: string;
 	race_progress: boolean;
-	Setrace_progress: React.Dispatch<any>;
+	Setrace_progress: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 	realtime_race_count: number | undefined;
 	Setrealtime_race_count: React.Dispatch<number>;
 	daily_race_count: number | undefined;
@@ -34,6 +34,7 @@ const Race: FC<{
 	our_race_count: number;
 	last_played_date: number | undefined;
 	SetOur_race_count: React.Dispatch<React.SetStateAction<number>>;
+	SetPending_prizes: React.Dispatch<React.SetStateAction<any[] | []>>;
 	exit: any;
 }> = ({
 	autorace,
@@ -50,12 +51,12 @@ const Race: FC<{
 	our_race_count,
 	last_played_date,
 	SetOur_race_count,
+	SetPending_prizes,
 	exit,
 }) => {
 	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
 		undefined
 	);
-	console.log({ race_progress });
 	useEffect(() => {
 		let mounted = true;
 		let interval_id: NodeJS.Timer | undefined = undefined;
@@ -85,15 +86,17 @@ const Race: FC<{
 					: plinfo_temp.daily_race_count
 			);
 			SetRace_results(race_results_temp);
+			SetPending_prizes(plinfo_temp.pending_prizes);
 		}
 
 		if (mounted)
 			update().then(() => {
+				console.log("update triggered");
 				interval_id = race_progress_updater();
 			});
 
 		return function cleanup() {
-			console.log("unmounted");
+			console.log("unmounted race.tsx");
 
 			mounted = false;
 			if (interval_id) clearInterval(interval_id); // stops fetching shit when told to
@@ -127,7 +130,9 @@ const Race: FC<{
 					last_played_date,
 					config
 				).then(async (result) => {
+					console.log("do_race() done");
 					if (result != undefined && result != 0) {
+						console.log(`result != undefined && result != 0, result ${result}`);
 						SetOur_race_count(
 							(current_our_race_count) => current_our_race_count + result
 						);
@@ -135,7 +140,23 @@ const Race: FC<{
 							await is_race_in_progress(account),
 							await get_people_in_queue(),
 						]);
-						Setrace_progress(race_prog_temp);
+						console.log(
+							`fetched race progress, people_in_queue race_progress ${race_progress}, people_in_queue ${people_in_queue_temp}`
+						);
+
+						Setrace_progress((prev_race_prog_temp) => {
+							console.log(`race progress before update ${prev_race_prog_temp}`);
+							console.log(`updating race progress with ${race_prog_temp}`);
+							if (prev_race_prog_temp === race_prog_temp)
+								console.log(
+									"prolly gonna exit since update didnt get triggered"
+								);
+							return race_prog_temp;
+						});
+						if (race_prog_temp === race_progress) {
+							console.log("clean exiting since update didnt trigger");
+							exit();
+						}
 						SetPeople_in_queue(people_in_queue_temp);
 					} else {
 						console.log(`exiting race.tsx result=${result}`);

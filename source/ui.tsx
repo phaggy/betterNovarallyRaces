@@ -202,6 +202,7 @@ const App: FC<{
 					SetOur_race_count={SetOur_race_count}
 					our_race_count={our_race_count}
 					last_played_date={last_played_date}
+					SetPending_prizes={SetPending_prizes}
 					exit={exit}
 				/>
 			) : (
