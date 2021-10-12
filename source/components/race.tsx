@@ -139,7 +139,7 @@ const Race: FC<{
 						SetOur_race_count(
 							(current_our_race_count) => current_our_race_count + result
 						);
-						const [race_prog_temp, people_in_queue_temp] = await Promise.all([
+						let [race_prog_temp, people_in_queue_temp] = await Promise.all([
 							await is_race_in_progress(account),
 							await get_people_in_queue(),
 						]);
@@ -147,20 +147,34 @@ const Race: FC<{
 							`fetched race progress, people_in_queue race_progress ${race_progress}, people_in_queue ${people_in_queue_temp}`
 						);
 
-						Setrace_progress((prev_race_prog_temp) => {
-							console.log(`race progress before update ${prev_race_prog_temp}`);
-							console.log(`updating race progress with ${race_prog_temp}`);
-							if (prev_race_prog_temp === race_prog_temp)
+						const race_progress_recursion = async (
+							race_progress: boolean | undefined
+						): Promise<void> => {
+							Setrace_progress((prev_race_prog_temp) => {
 								console.log(
-									"prolly gonna exit since update didnt get triggered"
+									`race progress before update ${prev_race_prog_temp}`
 								);
-							return race_prog_temp;
-						});
-						if (race_prog_temp === race_progress) {
-							console.log("clean exiting since update didnt trigger");
-							exit();
-						}
+								console.log(`updating race progress with ${race_prog_temp}`);
+								if (prev_race_prog_temp === race_prog_temp)
+									console.log(
+										"prev race progress same as new, trying to fetch again"
+									);
+								return race_prog_temp;
+							});
+							if (race_prog_temp === race_progress) {
+								console.log(
+									"prev race progress same as new, trying to fetch again"
+								);
+								race_prog_temp = await is_race_in_progress(account);
+								return race_progress_recursion(race_prog_temp);
+								// console.log("clean exiting since update didnt trigger");
+								// exit();
+							}
+						};
+						race_progress_recursion(race_progress);
+
 						SetPeople_in_queue(people_in_queue_temp);
+						people_in_queue_temp = 0;
 					} else {
 						console.log(`exiting race.tsx result=${result}`);
 						exit();
