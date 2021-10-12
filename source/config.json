@@ -1,7 +1,0 @@
-// this is an example config.json, delete this line before running the script
-{
-	"account": "accountname",
-	"private_key": "private_key",
-	"drivers": ["asset_id", "asset_id"],
-	"vehicles": ["asset_id"]
-}

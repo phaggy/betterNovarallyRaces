@@ -1,14 +1,10 @@
 name: NodeJS with pkg and tsc
-
 on:
   push:
     tags: v[1-9]+.[0-9]+.[0-9]+
-  # pull_request:
-  #   tags:
-  #     - "!v*-rc*"
-  #     - "v*"
-
-jobs:
+  pull_request:
+    tags: v[1-9]+.[0-9]+.[0-9]+
+      jobs:
   build:
     runs-on: ubuntu-latest
 
@@ -26,11 +22,7 @@ jobs:
 
       - name: Build
         run: |
-          npm install
-          npx tsc
-          npx webpack --mode=production
-          cd build/js
-          npx pkg package.json --no-bytecode -o binaries/race --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip
+          npm run build
         
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -39,4 +31,39 @@ jobs:
           files: |
             assets/*
             build/binaries/*
-            src/config.json
+
+
+name: NodeJS with pkg and tsc prerelease
+on:
+  push:
+    tags: v[1-9]+.[0-9]+.[0-9]+-pre
+  pull_request:
+    tags: v[1-9]+.[0-9]+.[0-9]+-pre
+      jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build
+        run: |
+          npm run build
+        
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          prerelease: true
+          title: "Development Build"
+          repo_token: "${{ secrets.RELEASE_TOKEN }}"
+          files: |
+            assets/*
+            build/binaries/*
