@@ -22,7 +22,7 @@ export const doTrx = async (
 		textEncoder: new TextEncoder(),
 	});
 	try {
-		// console.dir({ newActions }, { depth: null });
+		console.dir({ newActions }, { depth: null });
 		if (!dryrun)
 			await api.transact(
 				{

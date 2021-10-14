@@ -15,10 +15,11 @@ const cli = meow(
 	Options
 		--autorace
 		--dry-run (Wont do the trx but the whole program runs)
+		--inter (to race in intermediate league)
 
 	Examples
-	  $ ./betterNovarallyRaces --autorace
-	  $ ./betterNovarallyRaces [options] --dry-run
+	  $ ./betterNovarallyRaces [options(--inter)] --autorace
+	  $ ./betterNovarallyRaces [options(--inter,--autorace)] --dry-run
 
 	Options
 `,
@@ -28,6 +29,9 @@ const cli = meow(
 				type: "boolean",
 			},
 			dryrun: {
+				type: "boolean",
+			},
+			inter: {
 				type: "boolean",
 			},
 		},
@@ -40,7 +44,12 @@ export interface config {
 	account: string;
 	drivers: Array<string>;
 	vehicles: Array<string>;
-	endpoint: string;
+	inter?: {
+		drivers: Array<string>;
+		vehicles: Array<string>;
+	};
+	endpoint?: string;
+	to_inter: boolean;
 }
 
 let config: config;
@@ -60,6 +69,8 @@ const { drivers, vehicles, account, private_key } = config;
 const [driver1_asset_id, driver2_asset_id] = drivers;
 const [vehicle_asset_id] = vehicles;
 
+const { inter } = config;
+
 if (!account) {
 	console.log("wer account name");
 	process.exit();
@@ -74,6 +85,17 @@ if (!private_key || !/[A-Za-z0-9]{51}/gi.test(private_key)) {
 	console.log("missing private_key, or invalid");
 	process.exit();
 }
+
+if (cli.flags.inter && inter) {
+	const { drivers: inter_drivers, vehicles: inter_vehicles } = inter;
+	const [driver1_asset_id, driver2_asset_id] = inter_drivers;
+	const [vehicle_asset_id] = inter_vehicles;
+	if (!vehicle_asset_id || !driver1_asset_id || !driver2_asset_id) {
+		console.log("not enough drivers or vehicles for intermediate racing");
+		process.exit();
+	}
+	config = { ...config, to_inter: true };
+} else config = { ...config, to_inter: false };
 
 render(
 	<App

@@ -160,12 +160,31 @@ const get_player_info = async (account: string): Promise<player_info> => {
 const execute_race_action = async (
 	config: config,
 	dryrun: boolean | undefined
-) => {
+): Promise<void> => {
 	const { account, drivers, vehicles, permission } = config;
 	const [driver1_asset_id, driver2_asset_id] = drivers;
 	const [vehicle_asset_id] = vehicles;
-	const actions = [
-		{
+	const rookie = ["10000 SNAKOIL"];
+	const intermediate = ["5000 SNAKOIL", "2500 SNAKGAS"];
+
+	const join_action = {
+		account: "novarallyapp",
+		name: "join",
+		authorization: [
+			{
+				actor: account,
+				permission: permission || "race",
+			},
+		],
+		data: {
+			player: account,
+			vehicle_asset_id,
+			driver1_asset_id,
+			driver2_asset_id,
+		},
+	};
+	const get_transfer_actions = (quantity: string) => {
+		return {
 			account: "novarallytok",
 			name: "transfer",
 			authorization: [
@@ -177,28 +196,30 @@ const execute_race_action = async (
 			data: {
 				from: account,
 				to: "novarallyapp",
-				quantity: "10000 SNAKOIL",
+				quantity,
 				memo: "",
 			},
-		},
-		{
-			account: "novarallyapp",
-			name: "join",
-			authorization: [
-				{
-					actor: account,
-					permission: permission || "race",
-				},
+		};
+	};
+
+	if (config.to_inter)
+		await doTrx(
+			[
+				...intermediate.map((quantity) => get_transfer_actions(quantity)),
+				join_action,
 			],
-			data: {
-				player: account,
-				vehicle_asset_id,
-				driver1_asset_id,
-				driver2_asset_id,
-			},
-		},
-	];
-	await doTrx(actions, config, dryrun);
+			config,
+			dryrun
+		);
+	else
+		await doTrx(
+			[
+				...rookie.map((quantity) => get_transfer_actions(quantity)),
+				join_action,
+			],
+			config,
+			dryrun
+		);
 };
 
 export {

@@ -155,13 +155,13 @@ const Race: FC<{
 									`race progress before update ${prev_race_prog_temp}`
 								);
 								console.log(`updating race progress with ${race_prog_temp}`);
-								if (prev_race_prog_temp === race_prog_temp)
-									console.log(
-										"prev race progress same as new, trying to fetch again"
-									);
+								// if (prev_race_prog_temp === race_prog_temp )
+								// 	console.log(
+								// 		"prev race progress same as new, trying to fetch again"
+								// 	);
 								return race_prog_temp;
 							});
-							if (race_prog_temp === race_progress) {
+							if (race_prog_temp === race_progress && !dryrun) {
 								console.log(
 									"prev race progress same as new, trying to fetch again"
 								);
@@ -169,6 +169,9 @@ const Race: FC<{
 								return race_progress_recursion(race_prog_temp);
 								// console.log("clean exiting since update didnt trigger");
 								// exit();
+							} else if (race_prog_temp === race_progress && dryrun) {
+								console.log("clean exiting since update didnt trigger");
+								exit();
 							}
 						};
 						race_progress_recursion(race_progress);
