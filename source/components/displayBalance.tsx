@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC } from "react";
 import { Box, Text } from "ink";
 import { balance } from "../util/types";
 

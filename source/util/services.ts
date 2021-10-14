@@ -161,11 +161,20 @@ const execute_race_action = async (
 	config: config,
 	dryrun: boolean | undefined
 ): Promise<void> => {
-	const { account, drivers, vehicles, permission } = config;
-	const [driver1_asset_id, driver2_asset_id] = drivers;
-	const [vehicle_asset_id] = vehicles;
+	const { account, drivers, vehicles, permission, inter, to_inter } = config;
+	let [driver1_asset_id, driver2_asset_id] = ["", ""];
+	let vehicle_asset_id = "";
+	if (to_inter && inter) {
+		const { vehicles, drivers } = inter;
+		[driver1_asset_id, driver2_asset_id] = drivers;
+		[vehicle_asset_id] = vehicles;
+	} else {
+		[driver1_asset_id, driver2_asset_id] = drivers;
+		[vehicle_asset_id] = vehicles;
+	}
+
 	const rookie = ["10000 SNAKOIL"];
-	const intermediate = ["5000 SNAKOIL", "2500 SNAKGAS"];
+	const intermediate = ["2500 SNAKOIL", "5000 SNAKGAS"];
 
 	const join_action = {
 		account: "novarallyapp",

@@ -54,8 +54,17 @@ export interface config {
 
 let config: config;
 try {
-	console.log(path.resolve("config.json"));
-	const raw = fs.readFileSync(path.resolve("config.json"));
+	let path_to_config = path.resolve(__dirname, "config.json");
+	console.log(path_to_config);
+	if (!fs.existsSync(path_to_config)) {
+		path_to_config = path.resolve("../", __dirname, "config.json");
+		console.log(path_to_config);
+	}
+	if (!fs.existsSync(path_to_config)) {
+		path_to_config = path.resolve("config.json");
+		console.log(path_to_config);
+	}
+	const raw = fs.readFileSync(path_to_config);
 	config = JSON.parse(raw.toString());
 } catch (err: any) {
 	console.error(err.message);
@@ -94,8 +103,12 @@ if (cli.flags.inter && inter) {
 		console.log("not enough drivers or vehicles for intermediate racing");
 		process.exit();
 	}
+	console.log("Intermediate league");
 	config = { ...config, to_inter: true };
-} else config = { ...config, to_inter: false };
+} else {
+	console.log("Rookie league");
+	config = { ...config, to_inter: false };
+}
 
 render(
 	<App

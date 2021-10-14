@@ -31,6 +31,7 @@
 		"@babel/preset-react": "^7.14.5",
 		"@sindresorhus/tsconfig": "^2.0.0",
 		"@types/blacklist": "^1.1.0",
+		"@types/node": "^16.11.0",
 		"@types/node-fetch": "^2.5.12",
 		"@types/react": "^17.0.27",
 		"@typescript-eslint/eslint-plugin": "^4.33.0",
