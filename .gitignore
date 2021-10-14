@@ -3,3 +3,4 @@ dist/
 node_modules/
 *.txt
 config.json
+!assets/config.json
