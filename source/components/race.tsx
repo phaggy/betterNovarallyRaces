@@ -174,7 +174,7 @@ const Race: FC<{
 								exit();
 							}
 						};
-						race_progress_recursion(race_progress);
+						await race_progress_recursion(race_progress);
 
 						SetPeople_in_queue(people_in_queue_temp);
 						people_in_queue_temp = 0;

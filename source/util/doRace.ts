@@ -23,8 +23,8 @@ const do_race = async (
 			console.log("trying trx");
 			await execute_race_action(config, dryrun);
 			console.log("completed execute_race_action now sleeping for 500ms");
-			await sleep(500); // waiting for contract to reflect changes
-			console.log("slept for 500ms");
+			await sleep(750); // waiting for contract to reflect changes
+			console.log("slept for 750ms");
 			return 1;
 		} catch (err) {
 			return 0;
