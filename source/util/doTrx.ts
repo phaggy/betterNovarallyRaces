@@ -11,7 +11,7 @@ export const doTrx = async (
 	newActions: Array<any>,
 	config: config,
 	dryrun: boolean | undefined
-) => {
+): Promise<void> => {
 	const { private_key } = config;
 	const privateKeys = [private_key];
 	const signatureProvider = new JsSignatureProvider(privateKeys);
