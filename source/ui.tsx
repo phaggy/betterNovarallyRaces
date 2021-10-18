@@ -3,7 +3,6 @@ import { Box, Text, useApp } from "ink";
 import {
 	is_race_in_progress,
 	get_player_info,
-	get_snake_oil_balance,
 	get_race_results,
 	get_days,
 	get_snake__balance,
@@ -98,9 +97,6 @@ const App: FC<{
 					!race_progress &&
 					get_days(Date.now() - last_played_date * 1000) < 1
 				) {
-					console.log(
-						"exiting from ui.tsx , daily_race_count && daily_race_count >= 10 && !race_progress"
-					);
 					exit();
 				}
 			});

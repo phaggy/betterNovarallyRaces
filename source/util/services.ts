@@ -160,7 +160,7 @@ const get_player_info = async (account: string): Promise<player_info> => {
 const execute_race_action = async (
 	config: config,
 	dryrun: boolean | undefined
-) => {
+): Promise<void> => {
 	const { account, drivers, vehicles, permission } = config;
 	const [driver1_asset_id, driver2_asset_id] = drivers;
 	const [vehicle_asset_id] = vehicles;

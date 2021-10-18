@@ -46,6 +46,13 @@ const DisplayPrizes: FC<{
 										|Rare car shard|{" "}
 									</Text>
 								);
+							case "255786":
+								return (
+									<Text color="greenBright" key={index}>
+										{" "}
+										|Uncommon car shard|{" "}
+									</Text>
+								);
 							default:
 								return (
 									<Text color="greenBright" key={index}>
