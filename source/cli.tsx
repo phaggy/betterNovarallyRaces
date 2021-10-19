@@ -55,15 +55,13 @@ export interface config {
 let config: config;
 try {
 	let path_to_config = path.resolve(__dirname, "config.json");
-	console.log(path_to_config);
 	if (!fs.existsSync(path_to_config)) {
 		path_to_config = path.resolve("../", __dirname, "config.json");
-		console.log(path_to_config);
 	}
 	if (!fs.existsSync(path_to_config)) {
 		path_to_config = path.resolve("config.json");
-		console.log(path_to_config);
 	}
+	console.log(path_to_config);
 	const raw = fs.readFileSync(path_to_config);
 	config = JSON.parse(raw.toString());
 } catch (err: any) {
