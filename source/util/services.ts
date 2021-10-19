@@ -1,5 +1,7 @@
 import axios from "axios";
 import { ENDPOINT } from "../cli";
+import { ExplorerApi } from "atomicassets";
+import fetch from "node-fetch";
 
 import { doTrx } from "./doTrx";
 import { balance, player_info } from "./types";
@@ -11,6 +13,15 @@ const sleep = (ms: number): Promise<void> =>
 const get_days = (time_in_milli: number): number => {
 	return Math.floor(time_in_milli / (1000 * 60 * 60 * 24));
 };
+
+const atomicassetsApi = new ExplorerApi(
+	"https://wax.api.atomicassets.io",
+	"atomicassets",
+	{
+		// @ts-ignore
+		fetch,
+	}
+);
 
 const is_race_in_progress = async (account: string): Promise<boolean> => {
 	const data = {
@@ -241,4 +252,5 @@ export {
 	get_snake_oil_balance,
 	get_people_in_queue,
 	get_snake__balance,
+	atomicassetsApi,
 };

@@ -15,6 +15,7 @@ import Race from "./components/race";
 import DisplayRaceResults from "./components/displayResults";
 import DisplayPrizes from "./components/displayPrizes";
 import Balances from "./components/displayBalance";
+import DisplayAssets from "./components/displayAssets";
 
 const App: FC<{
 	autorace?: boolean;
@@ -108,7 +109,7 @@ const App: FC<{
 	}, []);
 
 	return (
-		<Box flexGrow={1} flexDirection="column">
+		<Box flexDirection="column">
 			<Box
 				flexGrow={1}
 				justifyContent="center"
@@ -126,86 +127,96 @@ const App: FC<{
 			<Box marginLeft={5}>
 				{snake__balance ? <Balances snake__balance={snake__balance} /> : <></>}
 			</Box>
-			<Box marginTop={1}>
-				{pending_prizes.length > 0 ? (
-					<DisplayPrizes pending_prizes={pending_prizes} />
-				) : (
-					<></>
-				)}
-			</Box>
-			<Box marginLeft={5}>
-				<Text>Daily Race count: </Text>
-				<Text color="yellowBright">{realtime_race_count}</Text>
-				{race_progress ? (
-					<>
-						<Text color="yellowBright"> +1 </Text>
-						<Text color="grey">(in progress)</Text>
-					</>
-				) : (
-					<></>
-				)}
-			</Box>
 
-			<Box marginLeft={5}>
-				<Text>Our race count: </Text>
-				<Text color="yellowBright">{our_race_count}</Text>
-			</Box>
-			<DisplayRaceResults
-				race_results={race_results}
-				realtime_race_count={realtime_race_count}
-			/>
-
-			{last_played_date &&
-			daily_race_count &&
-			daily_race_count >= 10 &&
-			!race_progress &&
-			get_days(Date.now() - last_played_date * 1000) < 1 ? (
-				<>
-					<Box
-						flexGrow={1}
-						justifyContent="center"
-						flexDirection="row"
-						marginTop={3}
-						marginBottom={3}
-						marginLeft={9}
-						marginRight={9}
-						borderColor="red"
-						borderStyle="classic"
-					>
-						<Text color="red" bold>
-							Daily race limit of 10 races reached, exiting...
-						</Text>
+			<Box flexDirection="row">
+				<Box flexGrow={1} flexDirection="column">
+					<Box marginTop={1}>
+						{pending_prizes.length > 0 ? (
+							<DisplayPrizes pending_prizes={pending_prizes} />
+						) : (
+							<></>
+						)}
 					</Box>
-				</>
-			) : (
-				<></>
-			)}
-			{daily_race_count && last_played_date && race_progress != undefined ? (
-				<Race
-					autorace={autorace}
-					dryrun={dryrun}
-					previous_results={previous_results}
-					race_results={race_results}
-					SetRace_results={SetRace_results}
-					player_info={player_info}
-					account={account}
-					race_progress={race_progress}
-					Setrace_progress={Setrace_progress}
-					daily_race_count={daily_race_count}
-					SetDaily_race_count={SetDaily_race_count}
-					realtime_race_count={realtime_race_count}
-					Setrealtime_race_count={Setrealtime_race_count}
-					Setsnake__balance={Setsnake__balance}
-					config={config}
-					SetOur_race_count={SetOur_race_count}
-					our_race_count={our_race_count}
-					last_played_date={last_played_date}
-					SetPending_prizes={SetPending_prizes}
-					exit={exit}
-				/>
-			) : (
-				<></>
-			)}
+					<Box marginLeft={5}>
+						<Text>Daily Race count: </Text>
+						<Text color="yellowBright">{realtime_race_count}</Text>
+						{race_progress ? (
+							<>
+								<Text color="yellowBright"> +1 </Text>
+								<Text color="grey">(in progress)</Text>
+							</>
+						) : (
+							<></>
+						)}
+					</Box>
+
+					<Box marginLeft={5}>
+						<Text>Our race count: </Text>
+						<Text color="yellowBright">{our_race_count}</Text>
+					</Box>
+					<DisplayRaceResults
+						race_results={race_results}
+						realtime_race_count={realtime_race_count}
+					/>
+
+					{last_played_date &&
+					daily_race_count &&
+					daily_race_count >= 10 &&
+					!race_progress &&
+					get_days(Date.now() - last_played_date * 1000) < 1 ? (
+						<>
+							<Box
+								flexGrow={1}
+								justifyContent="center"
+								flexDirection="row"
+								marginTop={3}
+								marginBottom={3}
+								marginLeft={9}
+								marginRight={9}
+								borderColor="red"
+								borderStyle="classic"
+							>
+								<Text color="red" bold>
+									Daily race limit of 10 races reached, exiting...
+								</Text>
+							</Box>
+						</>
+					) : (
+						<></>
+					)}
+					{daily_race_count &&
+					last_played_date &&
+					race_progress != undefined ? (
+						<Race
+							autorace={autorace}
+							dryrun={dryrun}
+							previous_results={previous_results}
+							race_results={race_results}
+							SetRace_results={SetRace_results}
+							player_info={player_info}
+							account={account}
+							race_progress={race_progress}
+							Setrace_progress={Setrace_progress}
+							daily_race_count={daily_race_count}
+							SetDaily_race_count={SetDaily_race_count}
+							realtime_race_count={realtime_race_count}
+							Setrealtime_race_count={Setrealtime_race_count}
+							Setsnake__balance={Setsnake__balance}
+							config={config}
+							SetOur_race_count={SetOur_race_count}
+							our_race_count={our_race_count}
+							last_played_date={last_played_date}
+							SetPending_prizes={SetPending_prizes}
+							exit={exit}
+						/>
+					) : (
+						<></>
+					)}
+				</Box>
+				<Box flexGrow={1} flexDirection="column" justifyContent="flex-end">
+					<DisplayAssets config={config} />
+				</Box>
+			</Box>
 		</Box>
 	);
 };
