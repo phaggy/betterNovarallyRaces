@@ -128,7 +128,7 @@ const App: FC<{
 				{snake__balance ? <Balances snake__balance={snake__balance} /> : <></>}
 			</Box>
 
-			<Box flexDirection="row">
+			<Box flexDirection="row" flexGrow={1}>
 				<Box flexGrow={1} flexDirection="column">
 					<Box marginTop={1}>
 						{pending_prizes.length > 0 ? (
@@ -213,8 +213,18 @@ const App: FC<{
 						<></>
 					)}
 				</Box>
-				<Box flexGrow={1} flexDirection="column" justifyContent="flex-end">
-					<DisplayAssets config={config} />
+				<Box
+					flexShrink={2}
+					flexDirection="row"
+					justifyContent="center"
+					alignItems="center"
+					marginRight={5}
+				>
+					{race_progress !== undefined ? (
+						<DisplayAssets config={config} race_progress={race_progress} />
+					) : (
+						<></>
+					)}
 				</Box>
 			</Box>
 		</Box>
