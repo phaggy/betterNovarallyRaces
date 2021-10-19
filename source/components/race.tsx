@@ -116,7 +116,7 @@ const Race: FC<{
 				}
 			}, 5000);
 			return interval;
-		} else {
+		} else if (race_progress === false) {
 			if (daily_race_count && last_played_date) {
 				do_race(
 					dryrun,
@@ -134,16 +134,18 @@ const Race: FC<{
 							await is_race_in_progress(account),
 							await get_people_in_queue(),
 						]);
-						const race_progress_recursion = async (
-							race_progress: boolean | undefined
-						): Promise<void> => {
+						const race_progress_recursion = async (): Promise<void> => {
 							if (race_prog_temp === race_progress && !dryrun) {
+								// console.log(
+								// 	`prev race progress same as new, trying to fetch again ${race_progress} ${race_prog_temp}`
+								// );
+								// await sleep(750);
+								// race_prog_temp = await is_race_in_progress(account);
 								console.log(
-									"prev race progress same as new, trying to fetch again"
+									"cahngeng race progress to ture since update didnt trigger"
 								);
-								await sleep(750);
-								race_prog_temp = await is_race_in_progress(account);
-								return race_progress_recursion(race_prog_temp);
+								race_prog_temp = true;
+								// return race_progress_recursion();
 								// console.log("clean exiting since update didnt trigger");
 								// exit();
 							} else if (race_prog_temp === race_progress && dryrun) {
@@ -152,7 +154,7 @@ const Race: FC<{
 							}
 							Setrace_progress(race_prog_temp);
 						};
-						await race_progress_recursion(race_progress);
+						await race_progress_recursion();
 						SetPeople_in_queue(people_in_queue_temp);
 						people_in_queue_temp = 0;
 					} else {
@@ -162,7 +164,7 @@ const Race: FC<{
 				});
 			}
 			return undefined;
-		}
+		} else return undefined;
 	};
 
 	return (
@@ -178,7 +180,14 @@ const Race: FC<{
 					</Text>
 				</Box>
 			) : (
-				<Box marginLeft={5} marginTop={1}></Box>
+				<Box marginLeft={5} marginTop={1}>
+					<Text>
+						<Text color="green">
+							<Spinner type="dots" />
+						</Text>
+						{" Trying to race"}
+					</Text>
+				</Box>
 			)}
 		</>
 	);
