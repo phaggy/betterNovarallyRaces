@@ -130,33 +130,9 @@ const Race: FC<{
 						SetOur_race_count(
 							(current_our_race_count) => current_our_race_count + result
 						);
-						let [race_prog_temp, people_in_queue_temp] = await Promise.all([
-							await is_race_in_progress(account),
-							await get_people_in_queue(),
-						]);
-						const race_progress_recursion = async (): Promise<void> => {
-							if (race_prog_temp === race_progress && !dryrun) {
-								// console.log(
-								// 	`prev race progress same as new, trying to fetch again ${race_progress} ${race_prog_temp}`
-								// );
-								// await sleep(750);
-								// race_prog_temp = await is_race_in_progress(account);
-								console.log(
-									"cahngeng race progress to ture since update didnt trigger"
-								);
-								race_prog_temp = true;
-								// return race_progress_recursion();
-								// console.log("clean exiting since update didnt trigger");
-								// exit();
-							} else if (race_prog_temp === race_progress && dryrun) {
-								console.log("clean exiting since update didnt trigger");
-								exit();
-							}
-							Setrace_progress(race_prog_temp);
-						};
-						await race_progress_recursion();
+						const people_in_queue_temp = await get_people_in_queue();
 						SetPeople_in_queue(people_in_queue_temp);
-						people_in_queue_temp = 0;
+						Setrace_progress(true);
 					} else {
 						console.log("trx unsuccesful, exiting");
 						exit();
