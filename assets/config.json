@@ -5,7 +5,7 @@
 	"drivers": ["asset_id", "asset_id"],
 	"vehicles": ["asset_id"]
 	// optional, for intermediate races
-	,"inter:": {
+	,"inter": {
 		"drivers": ["asset_id", "asset_id"],
 		"vehicles": ["asset_id"]
 	}
