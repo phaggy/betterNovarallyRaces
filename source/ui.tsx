@@ -52,8 +52,6 @@ const App: FC<{
 
 	const [mounted, SetMounted] = useState(true);
 
-	console.log("ui.tsx", { mounted });
-
 	// const changeOurRaceCountFromChild = (our_race_count: number) => {
 	// 	SetOur_race_count(our_race_count);
 	// };

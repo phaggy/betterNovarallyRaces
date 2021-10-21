@@ -8,12 +8,10 @@ const DisplayAssets: FC<{
 	race_progress: boolean;
 	mounted: boolean;
 }> = ({ config, race_progress, mounted }) => {
-	console.log({ mounted });
-
 	const [assets, SetAssets] = useState<undefined | any[]>(undefined);
 	useEffect(() => {
 		let assets: string[] = [];
-		if (config.to_inter && config.inter) {
+		if (config.league === "inter" && config.inter) {
 			const { inter } = config;
 			assets = [...inter.drivers, ...inter.vehicles];
 		} else assets = [...config.drivers, ...config.vehicles];
@@ -47,46 +45,47 @@ const DisplayAssets: FC<{
 
 	return (
 		<Box
-			flexDirection="row"
+			flexDirection="column"
 			justifyContent="center"
 			alignItems="flex-start"
 			borderStyle="single"
 			borderColor="gray"
 			flexShrink={0}
 		>
-			{assets && assets.length > 0 ? (
-				assets.map((asset, index) => (
-					<Box
-						flexDirection="column"
-						borderStyle="classic"
-						borderColor="cyan"
-						flexShrink={0}
-						key={index}
-					>
-						<Box marginBottom={0.2} alignSelf="center">
-							<Text underline={true}>{asset.league}</Text>
+			<Box alignSelf="center">
+				<Text>{config.league}</Text>
+			</Box>
+			<Box flexDirection="row">
+				{assets && assets.length > 0 ? (
+					assets.map((asset, index) => (
+						<Box
+							flexDirection="column"
+							borderStyle="classic"
+							borderColor="cyan"
+							flexShrink={0}
+							key={index}
+						>
+							<Box paddingBottom={0.4}>
+								<Text>{asset.name}</Text>
+							</Box>
+							<Box>
+								<Text>
+									wins:{" "}
+									{config.league === "rookie"
+										? asset.rookie_wins
+										: config.league === "inter"
+										? asset.inter_wins
+										: config.league === "veteran"
+										? asset.veteran_wins
+										: 0}
+								</Text>
+							</Box>
 						</Box>
-
-						<Box>
-							<Text>{asset.name}</Text>
-						</Box>
-						<Box>
-							<Text>
-								wins:{" "}
-								{asset.league === "Rookie"
-									? asset.rookie_wins
-									: asset.league === "Intermediate"
-									? asset.inter_wins
-									: asset.league === "Veteran"
-									? asset.veteran_wins
-									: 0}
-							</Text>
-						</Box>
-					</Box>
-				))
-			) : (
-				<></>
-			)}
+					))
+				) : (
+					<></>
+				)}
+			</Box>
 		</Box>
 	);
 };

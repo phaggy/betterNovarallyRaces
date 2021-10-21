@@ -172,10 +172,10 @@ const execute_race_action = async (
 	config: config,
 	dryrun: boolean | undefined
 ): Promise<void> => {
-	const { account, drivers, vehicles, permission, inter, to_inter } = config;
+	const { account, drivers, vehicles, permission, inter, league } = config;
 	let [driver1_asset_id, driver2_asset_id] = ["", ""];
 	let vehicle_asset_id = "";
-	if (to_inter && inter) {
+	if (league === "inter" && inter) {
 		const { vehicles, drivers } = inter;
 		[driver1_asset_id, driver2_asset_id] = drivers;
 		[vehicle_asset_id] = vehicles;
@@ -222,24 +222,37 @@ const execute_race_action = async (
 		};
 	};
 
-	if (config.to_inter)
-		await doTrx(
-			[
-				...intermediate.map((quantity) => get_transfer_actions(quantity)),
-				join_action,
-			],
-			config,
-			dryrun
-		);
-	else
-		await doTrx(
-			[
-				...rookie.map((quantity) => get_transfer_actions(quantity)),
-				join_action,
-			],
-			config,
-			dryrun
-		);
+	switch (league) {
+		case "rookie":
+			await doTrx(
+				[
+					...rookie.map((quantity) => get_transfer_actions(quantity)),
+					join_action,
+				],
+				config,
+				dryrun
+			);
+			break;
+		case "inter":
+			await doTrx(
+				[
+					...intermediate.map((quantity) => get_transfer_actions(quantity)),
+					join_action,
+				],
+				config,
+				dryrun
+			);
+			break;
+		default:
+			await doTrx(
+				[
+					...rookie.map((quantity) => get_transfer_actions(quantity)),
+					join_action,
+				],
+				config,
+				dryrun
+			);
+	}
 };
 
 export {

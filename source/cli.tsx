@@ -49,7 +49,7 @@ export interface config {
 		vehicles: Array<string>;
 	};
 	endpoint?: string;
-	to_inter: boolean;
+	league: "rookie" | "inter" | "veteran" | "masters";
 }
 
 let config: config;
@@ -102,10 +102,10 @@ if (cli.flags.inter && inter) {
 		process.exit();
 	}
 	console.log("Intermediate league");
-	config = { ...config, to_inter: true };
+	config = { ...config, league: "inter" };
 } else {
 	console.log("Rookie league");
-	config = { ...config, to_inter: false };
+	config = { ...config, league: "rookie" };
 }
 
 render(
