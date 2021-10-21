@@ -116,7 +116,7 @@ const Race: FC<{
 				}
 			}, 5000);
 			return interval;
-		} else {
+		} else if (race_progress === false) {
 			if (daily_race_count && last_played_date) {
 				do_race(
 					dryrun,
@@ -130,31 +130,9 @@ const Race: FC<{
 						SetOur_race_count(
 							(current_our_race_count) => current_our_race_count + result
 						);
-						let [race_prog_temp, people_in_queue_temp] = await Promise.all([
-							await is_race_in_progress(account),
-							await get_people_in_queue(),
-						]);
-						const race_progress_recursion = async (
-							race_progress: boolean | undefined
-						): Promise<void> => {
-							if (race_prog_temp === race_progress && !dryrun) {
-								console.log(
-									"prev race progress same as new, trying to fetch again"
-								);
-								await sleep(750);
-								race_prog_temp = await is_race_in_progress(account);
-								return race_progress_recursion(race_prog_temp);
-								// console.log("clean exiting since update didnt trigger");
-								// exit();
-							} else if (race_prog_temp === race_progress && dryrun) {
-								console.log("clean exiting since update didnt trigger");
-								exit();
-							}
-							Setrace_progress(race_prog_temp);
-						};
-						await race_progress_recursion(race_progress);
+						const people_in_queue_temp = await get_people_in_queue();
 						SetPeople_in_queue(people_in_queue_temp);
-						people_in_queue_temp = 0;
+						Setrace_progress(true);
 					} else {
 						console.log("trx unsuccesful, exiting");
 						exit();
@@ -162,7 +140,7 @@ const Race: FC<{
 				});
 			}
 			return undefined;
-		}
+		} else return undefined;
 	};
 
 	return (
@@ -178,7 +156,14 @@ const Race: FC<{
 					</Text>
 				</Box>
 			) : (
-				<Box marginLeft={5} marginTop={1}></Box>
+				<Box marginLeft={5} marginTop={1}>
+					<Text>
+						<Text color="green">
+							<Spinner type="dots" />
+						</Text>
+						{" Trying to race"}
+					</Text>
+				</Box>
 			)}
 		</>
 	);
