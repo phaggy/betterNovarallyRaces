@@ -3,14 +3,20 @@ import { Box, Text } from "ink";
 import { atomicassetsApi } from "../util/services";
 import { config } from "../cli";
 
-const DisplayAssets: FC<{ config: config; race_progress: boolean }> = ({
-	config,
-	race_progress,
-}) => {
+const DisplayAssets: FC<{
+	config: config;
+	race_progress: boolean;
+	mounted: boolean;
+}> = ({ config, race_progress, mounted }) => {
+	console.log({ mounted });
+
 	const [assets, SetAssets] = useState<undefined | any[]>(undefined);
 	useEffect(() => {
-		let mounted = true;
-		const assets = [...config.drivers, ...config.vehicles];
+		let assets: string[] = [];
+		if (config.to_inter && config.inter) {
+			const { inter } = config;
+			assets = [...inter.drivers, ...inter.vehicles];
+		} else assets = [...config.drivers, ...config.vehicles];
 		const get_assets = async () => {
 			const assets_info = await Promise.all(
 				assets.map(async (asset_id) => {
@@ -27,35 +33,43 @@ const DisplayAssets: FC<{ config: config; race_progress: boolean }> = ({
 			console.log(assets_info);
 			return assets_info;
 		};
-		if (mounted)
-			get_assets()
-				.then((assets_info) => {
-					SetAssets(assets_info);
-				})
-				.catch(() => {
-					console.error("coulndt get asset");
-				});
-		return function cleanup() {
-			mounted = false;
-		};
+		get_assets()
+			.then((assets_info) => {
+				if (mounted) SetAssets(assets_info);
+			})
+			.catch(() => {
+				console.error("coulndt get asset");
+			});
+		// return function cleanup() {
+		// 	mounted = false;
+		// };
 	}, [race_progress]);
 
 	return (
-		<Box>
+		<Box
+			flexDirection="row"
+			justifyContent="center"
+			alignItems="flex-start"
+			borderStyle="single"
+			borderColor="gray"
+		>
 			{assets && assets.length > 0 ? (
 				assets.map((asset, index) => (
 					<Box
 						flexDirection="column"
-						borderStyle="round"
-						borderColor="blue"
+						borderStyle="classic"
+						borderColor="cyan"
 						key={index}
-						flexGrow={1}
 					>
 						<Box>
-							<Text>{asset.name}</Text>
+							<Text>{asset.league}</Text>
 						</Box>
 						<Box>
-							<Text>League: {asset.league}</Text>
+							<Text>-------</Text>
+						</Box>
+
+						<Box>
+							<Text>{asset.name}</Text>
 						</Box>
 						<Box>
 							<Text>

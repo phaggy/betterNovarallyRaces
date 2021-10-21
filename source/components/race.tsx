@@ -38,6 +38,8 @@ const Race: FC<{
 	SetOur_race_count: React.Dispatch<React.SetStateAction<number>>;
 	SetPending_prizes: React.Dispatch<React.SetStateAction<any[] | []>>;
 	exit: any;
+	mounted: boolean;
+	SetMounted: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({
 	autorace,
 	dryrun,
@@ -55,12 +57,13 @@ const Race: FC<{
 	SetOur_race_count,
 	SetPending_prizes,
 	exit,
+	mounted,
+	SetMounted,
 }) => {
 	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
 		undefined
 	);
 	useEffect(() => {
-		let mounted = true;
 		let interval_id: NodeJS.Timer | undefined = undefined;
 		async function update() {
 			await sleep(500);
@@ -91,13 +94,12 @@ const Race: FC<{
 			SetPending_prizes(plinfo_temp.pending_prizes);
 		}
 
-		if (mounted)
-			update().then(() => {
-				interval_id = race_progress_updater();
-			});
+		update().then(() => {
+			if (mounted) interval_id = race_progress_updater();
+		});
 
 		return function cleanup() {
-			mounted = false;
+			SetMounted(false);
 			if (interval_id) clearInterval(interval_id); // stops fetching shit when told to
 		};
 	}, [race_progress]); // updates data everytime race progress changes

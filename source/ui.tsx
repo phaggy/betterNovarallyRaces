@@ -50,6 +50,10 @@ const App: FC<{
 		undefined
 	);
 
+	const [mounted, SetMounted] = useState(true);
+
+	console.log("ui.tsx", { mounted });
+
 	// const changeOurRaceCountFromChild = (our_race_count: number) => {
 	// 	SetOur_race_count(our_race_count);
 	// };
@@ -58,8 +62,6 @@ const App: FC<{
 	const { exit } = useApp();
 
 	useEffect(() => {
-		let mounted = true;
-
 		async function fetchValues() {
 			const [
 				player_info_temp,
@@ -87,24 +89,26 @@ const App: FC<{
 					? player_info_temp.daily_race_count - 1
 					: player_info_temp.daily_race_count
 			);
+			if (
+				player_info_temp.last_played_date &&
+				player_info_temp.daily_race_count &&
+				player_info_temp.daily_race_count >= 10 &&
+				!race_progress_temp &&
+				get_days(Date.now() - player_info_temp.last_played_date * 1000) < 1
+			) {
+				console.log("exiting");
+				SetMounted(false);
+				// exit();
+			}
 		}
 
 		if (mounted) {
-			fetchValues().then(() => {
-				if (
-					last_played_date &&
-					daily_race_count &&
-					daily_race_count >= 10 &&
-					!race_progress &&
-					get_days(Date.now() - last_played_date * 1000) < 1
-				) {
-					exit();
-				}
-			});
+			fetchValues();
+			// .then(() => {});
 		}
 
 		return function cleanup() {
-			mounted = false;
+			SetMounted(false);
 		};
 	}, []);
 
@@ -159,32 +163,8 @@ const App: FC<{
 						realtime_race_count={realtime_race_count}
 					/>
 
-					{last_played_date &&
-					daily_race_count &&
-					daily_race_count >= 10 &&
-					!race_progress &&
-					get_days(Date.now() - last_played_date * 1000) < 1 ? (
-						<>
-							<Box
-								flexGrow={1}
-								justifyContent="center"
-								flexDirection="row"
-								marginTop={3}
-								marginBottom={3}
-								marginLeft={9}
-								marginRight={9}
-								borderColor="red"
-								borderStyle="classic"
-							>
-								<Text color="red" bold>
-									Daily race limit of 10 races reached, exiting...
-								</Text>
-							</Box>
-						</>
-					) : (
-						<></>
-					)}
 					{daily_race_count &&
+					daily_race_count < 10 &&
 					last_played_date &&
 					race_progress != undefined ? (
 						<Race
@@ -208,25 +188,56 @@ const App: FC<{
 							last_played_date={last_played_date}
 							SetPending_prizes={SetPending_prizes}
 							exit={exit}
+							mounted={mounted}
+							SetMounted={SetMounted}
 						/>
 					) : (
 						<></>
 					)}
 				</Box>
-				<Box
-					flexShrink={2}
-					flexDirection="row"
-					justifyContent="center"
-					alignItems="center"
-					marginRight={5}
-				>
+				<Box marginRight={5} marginLeft={3} flexDirection="column" flexGrow={1}>
+					<Box>
+						<Text>Racing with:</Text>
+					</Box>
+
 					{race_progress !== undefined ? (
-						<DisplayAssets config={config} race_progress={race_progress} />
+						<>
+							<DisplayAssets
+								config={config}
+								race_progress={race_progress}
+								mounted={mounted}
+							/>
+						</>
 					) : (
 						<></>
 					)}
 				</Box>
 			</Box>
+			{last_played_date &&
+			daily_race_count &&
+			daily_race_count >= 10 &&
+			!race_progress &&
+			get_days(Date.now() - last_played_date * 1000) < 1 ? (
+				<>
+					<Box
+						flexGrow={1}
+						justifyContent="center"
+						flexDirection="row"
+						marginTop={3}
+						marginBottom={3}
+						marginLeft={9}
+						marginRight={9}
+						borderColor="red"
+						borderStyle="classic"
+					>
+						<Text color="red" bold>
+							Daily race limit of 10 races reached, exiting...
+						</Text>
+					</Box>
+				</>
+			) : (
+				<></>
+			)}
 		</Box>
 	);
 };
