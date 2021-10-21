@@ -195,7 +195,12 @@ const App: FC<{
 						<></>
 					)}
 				</Box>
-				<Box marginRight={5} marginLeft={3} flexDirection="column" flexGrow={1}>
+				<Box
+					marginRight={5}
+					marginLeft={3}
+					flexDirection="column"
+					flexShrink={0}
+				>
 					<Box>
 						<Text>Racing with:</Text>
 					</Box>

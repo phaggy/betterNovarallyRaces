@@ -52,6 +52,7 @@ const DisplayAssets: FC<{
 			alignItems="flex-start"
 			borderStyle="single"
 			borderColor="gray"
+			flexShrink={0}
 		>
 			{assets && assets.length > 0 ? (
 				assets.map((asset, index) => (
@@ -59,13 +60,11 @@ const DisplayAssets: FC<{
 						flexDirection="column"
 						borderStyle="classic"
 						borderColor="cyan"
+						flexShrink={0}
 						key={index}
 					>
-						<Box>
-							<Text>{asset.league}</Text>
-						</Box>
-						<Box>
-							<Text>-------</Text>
+						<Box marginBottom={0.2} alignSelf="center">
+							<Text underline={true}>{asset.league}</Text>
 						</Box>
 
 						<Box>
