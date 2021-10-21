@@ -28,9 +28,13 @@ const DisplayAssets: FC<{ config: config; race_progress: boolean }> = ({
 			return assets_info;
 		};
 		if (mounted)
-			get_assets().then((assets_info) => {
-				SetAssets(assets_info);
-			});
+			get_assets()
+				.then((assets_info) => {
+					SetAssets(assets_info);
+				})
+				.catch(() => {
+					console.error("coulndt get asset");
+				});
 		return function cleanup() {
 			mounted = false;
 		};
@@ -45,6 +49,7 @@ const DisplayAssets: FC<{ config: config; race_progress: boolean }> = ({
 						borderStyle="round"
 						borderColor="blue"
 						key={index}
+						flexGrow={1}
 					>
 						<Box>
 							<Text>{asset.name}</Text>

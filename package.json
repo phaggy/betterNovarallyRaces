@@ -10,7 +10,7 @@
 		"build": "npm install && npx tsc && npx webpack --mode=production && npx pkg package.json --no-bytecode -o build/binaries/race --targets node14-linux-x64,node14-macos-x64,node14-win-x64 --compress GZip",
 		"quick-build": "npx tsc && npx webpack --mode=development && npx pkg package.json --no-bytecode -o build/binaries/race --targets node14-linux-x64,node14-macos-x64,node14-win-x64",
 		"dev-build": "npx tsc && npx webpack --mode=development && npx pkg package.json -o build/binaries/betternovarally --targets node14-linux-x64,node14-macos-x64,node14-win-x64 -d",
-		"start": "npx ts-node ./source/cli.tsx",
+		"start": "npm install && npx ts-node ./source/cli.tsx",
 		"start-js": "node build/js/cli.js"
 	},
 	"dependencies": {
