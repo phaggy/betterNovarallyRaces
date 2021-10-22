@@ -48,7 +48,7 @@ const DisplayAssets: FC<{
 			flexDirection="column"
 			justifyContent="center"
 			alignItems="flex-start"
-			borderStyle="single"
+			borderStyle="classic"
 			borderColor="gray"
 			flexShrink={0}
 		>
@@ -60,7 +60,7 @@ const DisplayAssets: FC<{
 					assets.map((asset, index) => (
 						<Box
 							flexDirection="column"
-							borderStyle="classic"
+							borderStyle="single"
 							borderColor="cyan"
 							flexShrink={0}
 							key={index}
