@@ -57,13 +57,14 @@ const Race: FC<{
 	SetOur_race_count,
 	SetPending_prizes,
 	exit,
-	mounted,
 	SetMounted,
 }) => {
 	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
 		undefined
 	);
 	useEffect(() => {
+		let mounted = true;
+		console.log({ mounted });
 		let interval_id: NodeJS.Timer | undefined = undefined;
 		async function update() {
 			await sleep(500);
@@ -93,30 +94,31 @@ const Race: FC<{
 			SetRace_results(race_results_temp);
 			SetPending_prizes(plinfo_temp.pending_prizes);
 		}
-
-		update().then(() => {
-			if (mounted) interval_id = race_progress_updater();
-		});
+		if (mounted)
+			update().then(() => {
+				interval_id = race_progress_updater();
+			});
 
 		return function cleanup() {
-			SetMounted(false);
+			mounted = false;
 			if (interval_id) clearInterval(interval_id); // stops fetching shit when told to
 		};
 	}, [race_progress]); // updates data everytime race progress changes
 
 	const race_progress_updater = () => {
 		if (!autorace && our_race_count >= 1 && !race_progress) {
-			exit();
+			SetMounted(false);
 			return undefined;
 		} else if (race_progress != undefined && race_progress) {
 			const interval = setInterval(async () => {
-				const people_in_queue_temp = await get_people_in_queue();
+				const [people_in_queue_temp, race_progress_temp] = await Promise.all([
+					get_people_in_queue(),
+					is_race_in_progress(account),
+				]);
 				SetPeople_in_queue(people_in_queue_temp);
-				if (people_in_queue_temp >= 31) {
-					const race_progress_temp = await is_race_in_progress(account);
-					Setrace_progress(race_progress_temp);
-				}
-			}, 5000);
+				Setrace_progress(race_progress_temp);
+				console.log({ race_progress_temp });
+			}, 7500);
 			return interval;
 		} else if (race_progress === false) {
 			if (daily_race_count && last_played_date) {

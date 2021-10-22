@@ -162,7 +162,7 @@ const App: FC<{
 					/>
 
 					{daily_race_count &&
-					daily_race_count < 10 &&
+					daily_race_count <= 10 &&
 					last_played_date &&
 					race_progress != undefined ? (
 						<Race

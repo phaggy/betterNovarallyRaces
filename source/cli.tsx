@@ -6,6 +6,7 @@ import App from "./ui";
 
 import fs from "fs";
 import path from "path";
+import { get_asset_id_from_name } from "./util/services";
 
 const cli = meow(
 	`
@@ -72,6 +73,14 @@ try {
 
 export const ENDPOINT = config.endpoint || "https://wax.pink.gg";
 
+const test_asset_id = async (asset_raw: string) => {
+	if (!/[0-9]{13}/gi.test(asset_raw)) {
+		const asset = await get_asset_id_from_name(account, asset_raw);
+		console.log({ asset });
+		return asset;
+	} else return asset_raw;
+};
+
 const { drivers, vehicles, account, private_key } = config;
 const [driver1_asset_id, driver2_asset_id] = drivers;
 const [vehicle_asset_id] = vehicles;
@@ -87,31 +96,63 @@ if (!vehicle_asset_id || !driver1_asset_id || !driver2_asset_id) {
 	console.log("not enough drivers or vehicles");
 	process.exit();
 }
+const setUpAssets = async (
+	driver1_asset_id: string,
+	driver2_asset_id: string,
+	vehicle_asset_id: string
+) => {
+	[driver1_asset_id, driver2_asset_id] = await Promise.all([
+		test_asset_id(driver1_asset_id),
+		test_asset_id(driver2_asset_id),
+	]);
+	vehicle_asset_id = await test_asset_id(vehicle_asset_id);
+	return {
+		drivers: [driver1_asset_id, driver2_asset_id],
+		vehicles: [vehicle_asset_id],
+	};
+};
 
 if (!private_key || !/[A-Za-z0-9]{51}/gi.test(private_key)) {
 	console.log("missing private_key, or invalid");
 	process.exit();
 }
 
-if (cli.flags.inter && inter) {
-	const { drivers: inter_drivers, vehicles: inter_vehicles } = inter;
-	const [driver1_asset_id, driver2_asset_id] = inter_drivers;
-	const [vehicle_asset_id] = inter_vehicles;
-	if (!vehicle_asset_id || !driver1_asset_id || !driver2_asset_id) {
-		console.log("not enough drivers or vehicles for intermediate racing");
-		process.exit();
+const setUpLeagues = async () => {
+	if (cli.flags.inter && inter) {
+		const { drivers: inter_drivers, vehicles: inter_vehicles } = inter;
+		const [driver1_asset_id, driver2_asset_id] = inter_drivers;
+		const [vehicle_asset_id] = inter_vehicles;
+		if (!vehicle_asset_id || !driver1_asset_id || !driver2_asset_id) {
+			console.log("not enough drivers or vehicles for intermediate racing");
+			process.exit();
+		}
+		console.log("Intermediate league");
+		const { drivers, vehicles } = await setUpAssets(
+			driver1_asset_id,
+			driver2_asset_id,
+			vehicle_asset_id
+		);
+		console.log({ drivers, vehicles });
+		config = { ...config, drivers, vehicles, league: "inter" };
+	} else {
+		console.log("Rookie league");
+		const { drivers, vehicles } = await setUpAssets(
+			driver1_asset_id,
+			driver2_asset_id,
+			vehicle_asset_id
+		);
+		console.log({ drivers, vehicles });
+		config = { ...config, drivers, vehicles, league: "rookie" };
 	}
-	console.log("Intermediate league");
-	config = { ...config, league: "inter" };
-} else {
-	console.log("Rookie league");
-	config = { ...config, league: "rookie" };
-}
+};
 
-render(
-	<App
-		autorace={cli.flags.autorace}
-		dryrun={cli.flags.dryrun}
-		config={config}
-	/>
-);
+setUpLeagues().then(() => {
+	console.log(config);
+	render(
+		<App
+			autorace={cli.flags.autorace}
+			dryrun={cli.flags.dryrun}
+			config={config}
+		/>
+	);
+});

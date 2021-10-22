@@ -28,7 +28,6 @@ const DisplayAssets: FC<{
 					return { name, league, rookie_wins, inter_wins, veteran_wins };
 				})
 			);
-			console.log(assets_info);
 			return assets_info;
 		};
 		get_assets()

@@ -14,6 +14,43 @@ const get_days = (time_in_milli: number): number => {
 	return Math.floor(time_in_milli / (1000 * 60 * 60 * 24));
 };
 
+const get_asset_id_from_name = async (account: string, asset_name: string) => {
+	const atomicassetsApi = new ExplorerApi(
+		"https://wax.api.atomicassets.io",
+		"atomicassets",
+		{
+			// @ts-ignore
+			fetch,
+		}
+	);
+	const [name, rarity] = asset_name.split(" ");
+	console.log({ name, rarity });
+	if (name && rarity) {
+		const result = await atomicassetsApi.getAssets(
+			{ owner: account, match: name },
+			1,
+			100,
+			[
+				{
+					key: "Rarity",
+					value: rarity.charAt(0).toUpperCase() + rarity.slice(1),
+				},
+			]
+		);
+		if (result.length > 0) return result[0].asset_id;
+		throw new Error(`asset ${name} not found`);
+	} else if (name) {
+		const result = await atomicassetsApi.getAssets(
+			{ owner: account, match: name },
+			1,
+			100
+		);
+		if (result.length > 0) return result[0].asset_id;
+		throw new Error(`asset ${name} not found`);
+	}
+	throw new Error("Wer name?");
+};
+
 const atomicassetsApi = new ExplorerApi(
 	"https://wax.api.atomicassets.io",
 	"atomicassets",
@@ -266,4 +303,5 @@ export {
 	get_people_in_queue,
 	get_snake__balance,
 	atomicassetsApi,
+	get_asset_id_from_name,
 };
