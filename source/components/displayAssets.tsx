@@ -6,10 +6,10 @@ import { config } from "../cli";
 const DisplayAssets: FC<{
 	config: config;
 	race_progress: boolean;
-	mounted: boolean;
-}> = ({ config, race_progress, mounted }) => {
+}> = ({ config, race_progress }) => {
 	const [assets, SetAssets] = useState<undefined | any[]>(undefined);
 	useEffect(() => {
+		let mounted = true;
 		let assets: string[] = [];
 		if (config.league === "inter" && config.inter) {
 			const { inter } = config;
@@ -37,9 +37,9 @@ const DisplayAssets: FC<{
 			.catch(() => {
 				console.error("coulndt get asset");
 			});
-		// return function cleanup() {
-		// 	mounted = false;
-		// };
+		return function cleanup() {
+			mounted = false;
+		};
 	}, [race_progress]);
 
 	return (

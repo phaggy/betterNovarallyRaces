@@ -9,12 +9,7 @@ import {
 } from "./util/services";
 
 import { config } from "./cli";
-import {
-	balance,
-	info_results_batch,
-	player_info,
-	running_batch,
-} from "./util/types";
+import { info_results_batch, running_batch } from "./util/types";
 
 import Race from "./components/race";
 import DisplayRaceResults from "./components/displayResults";
@@ -202,19 +197,29 @@ const App: FC<{
 								race_results={info_results_batch.race_results}
 								realtime_race_count={info_results_batch.realtime_race_count}
 							/>
-							<Race
-								autorace={autorace}
-								dryrun={dryrun}
-								account={account}
-								info_results_batch={info_results_batch}
-								SetInfo_results_batch={SetInfo_results_batch}
-								running_batch={running_batch}
-								SetRunning_batch={SetRunning_batch}
-								config={config}
-								exit={exit}
-								mounted={mounted}
-								SetMounted={SetMounted}
-							/>
+							{info_results_batch.last_played_date &&
+							info_results_batch.daily_race_count &&
+							info_results_batch.daily_race_count >= 10 &&
+							!running_batch.race_progress &&
+							get_days(
+								Date.now() - info_results_batch.last_played_date * 1000
+							) < 1 ? (
+								<></>
+							) : (
+								<Race
+									autorace={autorace}
+									dryrun={dryrun}
+									account={account}
+									info_results_batch={info_results_batch}
+									SetInfo_results_batch={SetInfo_results_batch}
+									running_batch={running_batch}
+									SetRunning_batch={SetRunning_batch}
+									config={config}
+									exit={exit}
+									mounted={mounted}
+									SetMounted={SetMounted}
+								/>
+							)}
 						</Box>
 						<Box
 							marginRight={5}
@@ -230,7 +235,6 @@ const App: FC<{
 									<DisplayAssets
 										config={config}
 										race_progress={running_batch.race_progress}
-										mounted={mounted}
 									/>
 								</>
 							) : (
