@@ -82,22 +82,38 @@ const Race: FC<{
 				get_race_results(account),
 			]);
 
-			Setrace_progress(raceprog_temp);
-			Setsnake__balance(snake__balance_temp);
-			SetPeople_in_queue(people_in_queue_temp);
-			SetDaily_race_count(plinfo_temp.daily_race_count);
-			Setrealtime_race_count(
-				raceprog_temp
-					? plinfo_temp.daily_race_count - 1
-					: plinfo_temp.daily_race_count
-			);
-			SetRace_results(race_results_temp);
-			SetPending_prizes(plinfo_temp.pending_prizes);
+			return [
+				raceprog_temp,
+				plinfo_temp,
+				snake__balance_temp,
+				people_in_queue_temp,
+				race_results_temp,
+			];
 		}
 		if (mounted)
-			update().then(() => {
-				interval_id = race_progress_updater();
-			});
+			update().then(
+				([
+					raceprog_temp,
+					plinfo_temp,
+					snake__balance_temp,
+					people_in_queue_temp,
+					race_results_temp,
+				]) => {
+					console.log("update", { raceprog_temp });
+					interval_id = race_progress_updater(raceprog_temp);
+					Setrace_progress(raceprog_temp);
+					Setsnake__balance(snake__balance_temp);
+					SetPeople_in_queue(people_in_queue_temp);
+					SetDaily_race_count(plinfo_temp.daily_race_count);
+					Setrealtime_race_count(
+						raceprog_temp
+							? plinfo_temp.daily_race_count - 1
+							: plinfo_temp.daily_race_count
+					);
+					SetRace_results(race_results_temp);
+					SetPending_prizes(plinfo_temp.pending_prizes);
+				}
+			);
 
 		return function cleanup() {
 			mounted = false;
@@ -105,11 +121,14 @@ const Race: FC<{
 		};
 	}, [race_progress]); // updates data everytime race progress changes
 
-	const race_progress_updater = () => {
-		if (!autorace && our_race_count >= 1 && !race_progress) {
+	const race_progress_updater = (race_progress_from_update: boolean) => {
+		if (!autorace && our_race_count >= 1 && !race_progress_from_update) {
 			SetMounted(false);
 			return undefined;
-		} else if (race_progress != undefined && race_progress) {
+		} else if (
+			race_progress_from_update != undefined &&
+			race_progress_from_update
+		) {
 			const interval = setInterval(async () => {
 				const [people_in_queue_temp, race_progress_temp] = await Promise.all([
 					get_people_in_queue(),
@@ -117,14 +136,13 @@ const Race: FC<{
 				]);
 				SetPeople_in_queue(people_in_queue_temp);
 				Setrace_progress(race_progress_temp);
-				console.log({ race_progress_temp });
 			}, 7500);
 			return interval;
-		} else if (race_progress === false) {
+		} else if (race_progress_from_update === false) {
 			if (daily_race_count && last_played_date) {
 				do_race(
 					dryrun,
-					race_progress,
+					race_progress_from_update,
 					daily_race_count,
 					last_played_date,
 					config
@@ -137,6 +155,8 @@ const Race: FC<{
 						const people_in_queue_temp = await get_people_in_queue();
 						SetPeople_in_queue(people_in_queue_temp);
 						Setrace_progress(true);
+						await sleep(750);
+						console.log("slept for 750ms");
 					} else {
 						console.log("trx unsuccesful, exiting");
 						exit();
