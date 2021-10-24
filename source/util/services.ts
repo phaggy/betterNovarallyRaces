@@ -27,7 +27,7 @@ const get_asset_id_from_name = async (account: string, asset_name: string) => {
 	console.log({ name, rarity });
 	if (name && rarity) {
 		const result = await atomicassetsApi.getAssets(
-			{ owner: account, match: name },
+			{ owner: account, match: name, collection_name: "novarallywax" },
 			1,
 			100,
 			[
@@ -41,7 +41,7 @@ const get_asset_id_from_name = async (account: string, asset_name: string) => {
 		throw new Error(`asset ${name} not found`);
 	} else if (name) {
 		const result = await atomicassetsApi.getAssets(
-			{ owner: account, match: name },
+			{ owner: account, match: name, collection_name: "novarallywax" },
 			1,
 			100
 		);
