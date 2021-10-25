@@ -18,22 +18,25 @@ const DisplayPrizes: FC<{
 				return { ...prize_obj, count: prize_obj.count + 1 };
 			else return prize_obj;
 		});
+		const not_documented = prizes_template.find(
+			({ id }) => String(prize_id) === String(id)
+		);
+		if (!not_documented) console.log({ prize_id });
 	});
-	console.log(prizes_template);
 	return (
 		<>
 			<Box marginLeft={4} padding={1}>
 				<Text>
-					Pending prizes: [
+					Pending prizes: [{/* @ts-ignore */}
 					{prizes_template.map(({ prize, count }, index) => {
-						if (count > 0)
+						if (count > 0) {
 							return (
 								<Text color="greenBright" key={index}>
 									{" "}
 									|{prize} x{count}|{" "}
 								</Text>
 							);
-						else return <></>;
+						}
 					})}
 					]
 				</Text>

@@ -2,7 +2,12 @@ import React, { FC, useEffect, useState } from "react";
 import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
 
-import { balance, player_info } from "../util/types";
+import {
+	balance,
+	info_results_batch,
+	player_info,
+	running_batch,
+} from "../util/types";
 import {
 	get_people_in_queue,
 	get_player_info,
@@ -18,47 +23,29 @@ import do_race from "../util/doRace";
 const Race: FC<{
 	autorace: boolean | undefined;
 	dryrun: boolean | undefined;
-	previous_results: Array<any> | undefined;
-	race_results: Array<any> | undefined;
-	SetRace_results: React.Dispatch<React.SetStateAction<any[] | undefined>>;
-	player_info: player_info | undefined;
 	account: string;
-	race_progress: boolean;
-	Setrace_progress: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-	realtime_race_count: number | undefined;
-	Setrealtime_race_count: React.Dispatch<number>;
-	daily_race_count: number | undefined;
-	SetDaily_race_count: React.Dispatch<React.SetStateAction<number | undefined>>;
-	Setsnake__balance: React.Dispatch<
-		React.SetStateAction<balance[] | undefined>
-	>;
 	config: config;
-	our_race_count: number;
-	last_played_date: number | undefined;
-	SetOur_race_count: React.Dispatch<React.SetStateAction<number>>;
-	SetPending_prizes: React.Dispatch<React.SetStateAction<any[] | []>>;
+	info_results_batch: info_results_batch;
+	SetInfo_results_batch: React.Dispatch<
+		React.SetStateAction<info_results_batch | undefined>
+	>;
+	running_batch: running_batch;
+	SetRunning_batch: React.Dispatch<React.SetStateAction<any | undefined>>;
 	exit: any;
+	mounted: boolean;
+	SetMounted: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({
 	autorace,
 	dryrun,
-	race_progress,
-	Setrace_progress,
-	account,
-	Setsnake__balance,
-	daily_race_count,
-	SetDaily_race_count,
-	Setrealtime_race_count,
-	SetRace_results,
 	config,
-	our_race_count,
-	last_played_date,
-	SetOur_race_count,
-	SetPending_prizes,
+	account,
 	exit,
+	info_results_batch,
+	SetInfo_results_batch,
+	running_batch,
+	SetRunning_batch,
+	SetMounted,
 }) => {
-	const [people_in_queue, SetPeople_in_queue] = useState<undefined | number>(
-		undefined
-	);
 	useEffect(() => {
 		let mounted = true;
 		let interval_id: NodeJS.Timer | undefined = undefined;
@@ -78,63 +65,102 @@ const Race: FC<{
 				get_race_results(account),
 			]);
 
-			Setrace_progress(raceprog_temp);
-			Setsnake__balance(snake__balance_temp);
-			SetPeople_in_queue(people_in_queue_temp);
-			SetDaily_race_count(plinfo_temp.daily_race_count);
-			Setrealtime_race_count(
-				raceprog_temp
-					? plinfo_temp.daily_race_count - 1
-					: plinfo_temp.daily_race_count
-			);
-			SetRace_results(race_results_temp);
-			SetPending_prizes(plinfo_temp.pending_prizes);
+			return {
+				raceprog_temp,
+				plinfo_temp,
+				snake__balance_temp,
+				people_in_queue_temp,
+				race_results_temp,
+			};
 		}
-
 		if (mounted)
-			update().then(() => {
-				interval_id = race_progress_updater();
-			});
+			update().then(
+				({
+					raceprog_temp,
+					plinfo_temp,
+					snake__balance_temp,
+					people_in_queue_temp,
+					race_results_temp,
+				}) => {
+					interval_id = race_progress_updater(raceprog_temp);
+					SetRunning_batch((prevBatch: running_batch) => {
+						return {
+							...prevBatch,
+							race_progress: raceprog_temp,
+							people_in_queue: people_in_queue_temp,
+						};
+					});
+					SetInfo_results_batch((prevBatch) => {
+						if (prevBatch)
+							return {
+								...prevBatch,
+								snake__balance: snake__balance_temp,
+								daily_race_count: plinfo_temp.daily_race_count,
+								realtime_race_count: raceprog_temp
+									? plinfo_temp.daily_race_count - 1
+									: plinfo_temp.daily_race_count,
+								race_results: race_results_temp,
+								pending_prizes: plinfo_temp.pending_prizes,
+								player_info: plinfo_temp,
+							};
+						else return prevBatch;
+					});
+				}
+			);
 
 		return function cleanup() {
 			mounted = false;
 			if (interval_id) clearInterval(interval_id); // stops fetching shit when told to
 		};
-	}, [race_progress]); // updates data everytime race progress changes
+	}, [running_batch.race_progress]); // updates data everytime race progress changes
 
-	const race_progress_updater = () => {
-		if (!autorace && our_race_count >= 1 && !race_progress) {
-			exit();
+	const race_progress_updater = (race_progress_from_update: boolean) => {
+		const { our_race_count } = running_batch;
+		const { daily_race_count, last_played_date } = info_results_batch;
+		if (!autorace && our_race_count >= 1 && !race_progress_from_update) {
+			SetMounted(false);
 			return undefined;
-		} else if (race_progress != undefined && race_progress) {
+		} else if (
+			race_progress_from_update != undefined &&
+			race_progress_from_update
+		) {
 			const interval = setInterval(async () => {
-				const people_in_queue_temp = await get_people_in_queue();
-				SetPeople_in_queue(people_in_queue_temp);
-				if (people_in_queue_temp >= 31) {
-					const race_progress_temp = await is_race_in_progress(account);
-					Setrace_progress(race_progress_temp);
-				}
-			}, 5000);
+				const [people_in_queue_temp, race_progress_temp] = await Promise.all([
+					get_people_in_queue(),
+					is_race_in_progress(account),
+				]);
+				SetRunning_batch((prevBatch: running_batch) => {
+					return {
+						...prevBatch,
+						people_in_queue: people_in_queue_temp,
+						race_progress: race_progress_temp,
+					};
+				});
+			}, 7500);
 			return interval;
-		} else if (race_progress === false) {
+		} else if (race_progress_from_update === false) {
 			if (daily_race_count && last_played_date) {
 				do_race(
 					dryrun,
-					race_progress,
+					race_progress_from_update,
 					daily_race_count,
 					last_played_date,
 					config
 				).then(async (result) => {
 					if (result != undefined && result != 0) {
-						console.log("trx successful");
-						SetOur_race_count(
-							(current_our_race_count) => current_our_race_count + result
-						);
 						const people_in_queue_temp = await get_people_in_queue();
-						SetPeople_in_queue(people_in_queue_temp);
-						Setrace_progress(true);
+						SetRunning_batch((prevBatch: running_batch) => {
+							return {
+								...prevBatch,
+								our_race_count: prevBatch.our_race_count + 1,
+								people_in_queue: people_in_queue_temp,
+								race_progress: true,
+							};
+						});
+						await sleep(750);
 					} else {
 						console.log("trx unsuccesful, exiting");
+						SetMounted(false);
 						exit();
 					}
 				});
@@ -145,16 +171,36 @@ const Race: FC<{
 
 	return (
 		<>
-			{race_progress ? (
+			{running_batch.race_progress ? (
 				<Box marginLeft={5} marginTop={1}>
 					<Text>
 						<Text color="green">
 							<Spinner type="dots" />
 						</Text>
 						{" Race in progress, people in queue: "}
-						{people_in_queue}
+						{running_batch.people_in_queue}
 					</Text>
 				</Box>
+			) : !autorace &&
+			  running_batch.our_race_count >= 1 &&
+			  !running_batch.race_progress ? (
+				<>
+					<Box
+						flexGrow={1}
+						justifyContent="center"
+						flexDirection="row"
+						marginTop={3}
+						marginBottom={3}
+						marginLeft={9}
+						marginRight={9}
+						borderColor="red"
+						borderStyle="classic"
+					>
+						<Text color="red" bold>
+							1 race done, exiting...
+						</Text>
+					</Box>
+				</>
 			) : (
 				<Box marginLeft={5} marginTop={1}>
 					<Text>

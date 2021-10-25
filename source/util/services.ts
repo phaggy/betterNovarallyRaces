@@ -1,5 +1,7 @@
 import axios from "axios";
 import { ENDPOINT } from "../cli";
+import { ExplorerApi } from "atomicassets";
+import fetch from "node-fetch";
 
 import { doTrx } from "./doTrx";
 import { balance, player_info } from "./types";
@@ -11,6 +13,43 @@ const sleep = (ms: number): Promise<void> =>
 const get_days = (time_in_milli: number): number => {
 	return Math.floor(time_in_milli / (1000 * 60 * 60 * 24));
 };
+
+const get_asset_id_from_name = async (account: string, asset_name: string) => {
+	const [name, rarity] = asset_name.split(" ");
+	if (name && rarity) {
+		const result = await atomicassetsApi.getAssets(
+			{ owner: account, match: name, collection_name: "novarallywax" },
+			1,
+			100,
+			[
+				{
+					key: "Rarity",
+					value: rarity.charAt(0).toUpperCase() + rarity.slice(1),
+				},
+			]
+		);
+		if (result.length > 0) return result[0].asset_id;
+		throw new Error(`asset ${name} not found`);
+	} else if (name) {
+		const result = await atomicassetsApi.getAssets(
+			{ owner: account, match: name, collection_name: "novarallywax" },
+			1,
+			100
+		);
+		if (result.length > 0) return result[0].asset_id;
+		throw new Error(`asset ${name} not found`);
+	}
+	throw new Error("Wer name?");
+};
+
+const atomicassetsApi = new ExplorerApi(
+	"https://wax.api.atomicassets.io",
+	"atomicassets",
+	{
+		// @ts-ignore
+		fetch,
+	}
+);
 
 const is_race_in_progress = async (account: string): Promise<boolean> => {
 	const data = {
@@ -161,10 +200,10 @@ const execute_race_action = async (
 	config: config,
 	dryrun: boolean | undefined
 ): Promise<void> => {
-	const { account, drivers, vehicles, permission, inter, to_inter } = config;
+	const { account, drivers, vehicles, permission, inter, league } = config;
 	let [driver1_asset_id, driver2_asset_id] = ["", ""];
 	let vehicle_asset_id = "";
-	if (to_inter && inter) {
+	if (league === "inter" && inter) {
 		const { vehicles, drivers } = inter;
 		[driver1_asset_id, driver2_asset_id] = drivers;
 		[vehicle_asset_id] = vehicles;
@@ -211,24 +250,37 @@ const execute_race_action = async (
 		};
 	};
 
-	if (config.to_inter)
-		await doTrx(
-			[
-				...intermediate.map((quantity) => get_transfer_actions(quantity)),
-				join_action,
-			],
-			config,
-			dryrun
-		);
-	else
-		await doTrx(
-			[
-				...rookie.map((quantity) => get_transfer_actions(quantity)),
-				join_action,
-			],
-			config,
-			dryrun
-		);
+	switch (league) {
+		case "rookie":
+			await doTrx(
+				[
+					...rookie.map((quantity) => get_transfer_actions(quantity)),
+					join_action,
+				],
+				config,
+				dryrun
+			);
+			break;
+		case "inter":
+			await doTrx(
+				[
+					...intermediate.map((quantity) => get_transfer_actions(quantity)),
+					join_action,
+				],
+				config,
+				dryrun
+			);
+			break;
+		default:
+			await doTrx(
+				[
+					...rookie.map((quantity) => get_transfer_actions(quantity)),
+					join_action,
+				],
+				config,
+				dryrun
+			);
+	}
 };
 
 export {
@@ -241,4 +293,6 @@ export {
 	get_snake_oil_balance,
 	get_people_in_queue,
 	get_snake__balance,
+	atomicassetsApi,
+	get_asset_id_from_name,
 };
