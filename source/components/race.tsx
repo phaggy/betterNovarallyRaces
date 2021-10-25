@@ -24,24 +24,7 @@ const Race: FC<{
 	autorace: boolean | undefined;
 	dryrun: boolean | undefined;
 	account: string;
-	// previous_results: Array<any> | undefined;
-	// race_results: Array<any> | undefined;
-	// SetRace_results: React.Dispatch<React.SetStateAction<any[] | undefined>>;
-	// player_info: player_info | undefined;
-	// race_progress: boolean;
-	// Setrace_progress: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-	// realtime_race_count: number | undefined;
-	// Setrealtime_race_count: React.Dispatch<number>;
-	// daily_race_count: number | undefined;
-	// SetDaily_race_count: React.Dispatch<React.SetStateAction<number | undefined>>;
-	// Setsnake__balance: React.Dispatch<
-	// 	React.SetStateAction<balance[] | undefined>
-	// >;
 	config: config;
-	// our_race_count: number;
-	// last_played_date: number | undefined;
-	// SetOur_race_count: React.Dispatch<React.SetStateAction<number>>;
-	// SetPending_prizes: React.Dispatch<React.SetStateAction<any[] | []>>;
 	info_results_batch: info_results_batch;
 	SetInfo_results_batch: React.Dispatch<
 		React.SetStateAction<info_results_batch | undefined>
@@ -65,7 +48,6 @@ const Race: FC<{
 }) => {
 	useEffect(() => {
 		let mounted = true;
-		console.log({ mounted });
 		let interval_id: NodeJS.Timer | undefined = undefined;
 		async function update() {
 			await sleep(500);
@@ -100,7 +82,6 @@ const Race: FC<{
 					people_in_queue_temp,
 					race_results_temp,
 				}) => {
-					console.log("update", { raceprog_temp });
 					interval_id = race_progress_updater(raceprog_temp);
 					SetRunning_batch((prevBatch: running_batch) => {
 						return {
@@ -167,7 +148,6 @@ const Race: FC<{
 					config
 				).then(async (result) => {
 					if (result != undefined && result != 0) {
-						console.log("trx successful");
 						const people_in_queue_temp = await get_people_in_queue();
 						SetRunning_batch((prevBatch: running_batch) => {
 							return {
@@ -178,9 +158,9 @@ const Race: FC<{
 							};
 						});
 						await sleep(750);
-						console.log("slept for 750ms");
 					} else {
 						console.log("trx unsuccesful, exiting");
+						SetMounted(false);
 						exit();
 					}
 				});
@@ -191,7 +171,6 @@ const Race: FC<{
 
 	return (
 		<>
-			{console.log("race.tsx", { running_batch })}
 			{running_batch.race_progress ? (
 				<Box marginLeft={5} marginTop={1}>
 					<Text>

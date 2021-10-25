@@ -15,16 +15,7 @@ const get_days = (time_in_milli: number): number => {
 };
 
 const get_asset_id_from_name = async (account: string, asset_name: string) => {
-	const atomicassetsApi = new ExplorerApi(
-		"https://wax.api.atomicassets.io",
-		"atomicassets",
-		{
-			// @ts-ignore
-			fetch,
-		}
-	);
 	const [name, rarity] = asset_name.split(" ");
-	console.log({ name, rarity });
 	if (name && rarity) {
 		const result = await atomicassetsApi.getAssets(
 			{ owner: account, match: name, collection_name: "novarallywax" },

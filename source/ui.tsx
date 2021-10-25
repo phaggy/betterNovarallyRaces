@@ -22,46 +22,13 @@ const App: FC<{
 	dryrun?: boolean;
 	config: config;
 }> = ({ autorace, dryrun, config }) => {
-	// const [race_progress, Setrace_progress] = useState<undefined | true | false>(
-	// 	undefined
-	// );
-	// const [snake__balance, Setsnake__balance] = useState<balance[] | undefined>(
-	// 	undefined
-	// );
-	// const [realtime_race_count, Setrealtime_race_count] = useState<
-	// 	number | undefined
-	// >(undefined); // this is displayed in the console
-	// const [race_results, SetRace_results] = useState<Array<any> | undefined>(
-	// 	undefined
-	// );
-
-	// const [player_info, SetPlayer_info] = useState<player_info | undefined>(
-	// 	undefined
-	// );
-	// const [daily_race_count, SetDaily_race_count] = useState<number | undefined>(
-	// 	undefined
-	// ); // this is used to check if limit of 10 has been reached
-	// const [previous_results, SetPrevios_results] = useState<any[] | undefined>(
-	// 	undefined
-	// );
-	// const [pending_prizes, SetPending_prizes] = useState<any[] | []>([]);
-	// const [our_race_count, SetOur_race_count] = useState(0);
-	// const [last_played_date, SetLast_played_date] = useState<number | undefined>(
-	// 	undefined
-	// );
-
 	const [mounted, SetMounted] = useState(true);
-
 	const [info_results_batch, SetInfo_results_batch] = useState<
 		info_results_batch | undefined
 	>(undefined);
 	const [running_batch, SetRunning_batch] = useState<running_batch | undefined>(
 		undefined
 	);
-
-	// const changeOurRaceCountFromChild = (our_race_count: number) => {
-	// 	SetOur_race_count(our_race_count);
-	// };
 
 	const { account } = config;
 	const { exit } = useApp();
@@ -80,6 +47,12 @@ const App: FC<{
 				get_race_results(account),
 			]);
 
+			SetRunning_batch({
+				our_race_count: 0,
+				race_progress: race_progress_temp,
+				people_in_queue: 0,
+			});
+
 			SetInfo_results_batch({
 				snake__balance: snake__balance_temp,
 				race_results: previous_results_temp,
@@ -93,26 +66,6 @@ const App: FC<{
 				last_played_date: player_info_temp.last_played_date,
 			});
 
-			SetRunning_batch({
-				our_race_count: 0,
-				race_progress: race_progress_temp,
-				people_in_queue: 0,
-			});
-
-			// SetPlayer_info(player_info_temp);
-			// SetPrevios_results(previous_results_temp);
-			// SetDaily_race_count(player_info_temp.daily_race_count);
-			// SetLast_played_date(player_info_temp.last_played_date);
-			// Setsnake__balance(snake__balance_temp);
-			// Setrace_progress(race_progress_temp);
-			// SetRace_results(previous_results_temp);
-			// SetPending_prizes(player_info_temp.pending_prizes);
-
-			// Setrealtime_race_count(
-			// 	race_progress_temp
-			// 		? player_info_temp.daily_race_count - 1
-			// 		: player_info_temp.daily_race_count
-			// );
 			if (
 				player_info_temp.last_played_date &&
 				player_info_temp.daily_race_count &&
@@ -122,13 +75,11 @@ const App: FC<{
 			) {
 				console.log("exiting");
 				SetMounted(false);
-				// exit();
 			}
 		}
 
 		if (mounted) {
 			fetchValues();
-			// .then(() => {});
 		}
 
 		return function cleanup() {
@@ -138,7 +89,6 @@ const App: FC<{
 
 	return (
 		<Box flexDirection="column">
-			{console.log("ui.tsx", { running_batch })}
 			{info_results_batch && running_batch ? (
 				<>
 					<Box

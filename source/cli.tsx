@@ -76,7 +76,6 @@ export const ENDPOINT = config.endpoint || "https://wax.pink.gg";
 const test_asset_id = async (asset_raw: string) => {
 	if (!/[0-9]{13}/gi.test(asset_raw)) {
 		const asset = await get_asset_id_from_name(account, asset_raw);
-		console.log({ asset });
 		return asset;
 	} else return asset_raw;
 };
@@ -147,7 +146,6 @@ const setUpLeagues = async () => {
 };
 
 setUpLeagues().then(() => {
-	console.log(config);
 	render(
 		<App
 			autorace={cli.flags.autorace}
