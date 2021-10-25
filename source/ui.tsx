@@ -100,9 +100,9 @@ const App: FC<{
 						borderStyle="round"
 					>
 						{autorace ? (
-							<Text color="greenBright">---autorace---</Text>
+							<Text color="greenBright">{config.league}, autorace</Text>
 						) : (
-							<Text color="greenBright">---no-autorace---</Text>
+							<Text color="greenBright">{config.league}, no-autorace</Text>
 						)}
 					</Box>
 					<Box marginLeft={5}>
