@@ -136,7 +136,7 @@ const Race: FC<{
 						race_progress: race_progress_temp,
 					};
 				});
-			}, 7500);
+			}, 10000);
 			return interval;
 		} else if (race_progress_from_update === false) {
 			if (daily_race_count && last_played_date) {
