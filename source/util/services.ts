@@ -212,8 +212,10 @@ const execute_race_action = async (
 		[vehicle_asset_id] = vehicles;
 	}
 
-	const rookie = ["10000 SNAKOIL"];
-	const intermediate = ["2500 SNAKOIL", "5000 SNAKGAS"];
+	const rookie = ["2500 SNAKOIL"];
+	const intermediate = ["625 SNAKOIL", "1250 SNAKGAS"];
+	const veteran = ["250 SNAKOIL", "625 SNAKGAS", "1250 SNAKPOW"];
+	const master = ["125 SNAKOIL", "250 SNAKGAS", "625 SNAKPOW", "1250 SNAKVEN"];
 
 	const join_action = {
 		account: "novarallyapp",
